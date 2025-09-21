@@ -773,25 +773,52 @@ const Vocabulary: React.FC = () => {
                     
                     sections.push(
                       <div key={`memory-${index}`} style={{ 
-                        marginBottom: 20, 
-                        padding: '20px', 
-                        background: 'linear-gradient(135deg, #f6ffed 0%, #d9f7be 100%)', 
-                        borderRadius: 12,
-                        border: '2px solid #95de64',
-                        boxShadow: '0 4px 12px rgba(82, 196, 26, 0.15)'
+                        marginBottom: 24, 
+                        padding: '24px', 
+                        background: 'linear-gradient(135deg, #e6f7ff 0%, #bae7ff 50%, #91d5ff 100%)', 
+                        borderRadius: 16,
+                        border: '3px solid #1890ff',
+                        boxShadow: '0 8px 24px rgba(24, 144, 255, 0.25), 0 4px 8px rgba(24, 144, 255, 0.15)',
+                        position: 'relative',
+                        overflow: 'hidden'
                       }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                          <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#389e0d' }}>🧠 联想记忆</Text>
+                        <div style={{
+                          position: 'absolute',
+                          top: 0,
+                          right: 0,
+                          width: '60px',
+                          height: '60px',
+                          background: 'rgba(24, 144, 255, 0.1)',
+                          borderRadius: '0 16px 0 60px',
+                          zIndex: 0
+                        }} />
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, position: 'relative', zIndex: 1 }}>
+                          <div style={{
+                            background: '#1890ff',
+                            borderRadius: '50%',
+                            width: '32px',
+                            height: '32px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '16px'
+                          }}>
+                            🧠
+                          </div>
+                          <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#1890ff', textShadow: '0 1px 2px rgba(0,0,0,0.1)' }}>联想记忆</Text>
                         </div>
-                        <Text style={{ 
-                          fontSize: 16, 
-                          lineHeight: 1.6, 
-                          color: '#237804',
-                          fontWeight: '500',
-                          display: 'block'
-                        }}>
-                          {memory}
-                        </Text>
+                        <div style={{ position: 'relative', zIndex: 1 }}>
+                          <Text style={{ 
+                            fontSize: 17, 
+                            lineHeight: 1.7, 
+                            color: '#003a8c',
+                            fontWeight: '600',
+                            display: 'block',
+                            textShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                          }}>
+                            {memory}
+                          </Text>
+                        </div>
                       </div>
                     );
                   }
@@ -811,25 +838,52 @@ const Vocabulary: React.FC = () => {
                     
                     sections.push(
                       <div key={`related-${index}`} style={{ 
-                        marginBottom: 20, 
-                        padding: '20px', 
-                        background: 'linear-gradient(135deg, #fff2e8 0%, #ffd8bf 100%)', 
-                        borderRadius: 12,
-                        border: '2px solid #ff9c6e',
-                        boxShadow: '0 4px 12px rgba(250, 140, 22, 0.15)'
+                        marginBottom: 24, 
+                        padding: '24px', 
+                        background: 'linear-gradient(135deg, #fff7e6 0%, #ffd591 50%, #ffa940 100%)', 
+                        borderRadius: 16,
+                        border: '3px solid #fa8c16',
+                        boxShadow: '0 8px 24px rgba(250, 140, 22, 0.25), 0 4px 8px rgba(250, 140, 22, 0.15)',
+                        position: 'relative',
+                        overflow: 'hidden'
                       }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                          <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#d4380d' }}>🔗 相关词汇</Text>
+                        <div style={{
+                          position: 'absolute',
+                          top: 0,
+                          right: 0,
+                          width: '60px',
+                          height: '60px',
+                          background: 'rgba(250, 140, 22, 0.1)',
+                          borderRadius: '0 16px 0 60px',
+                          zIndex: 0
+                        }} />
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, position: 'relative', zIndex: 1 }}>
+                          <div style={{
+                            background: '#fa8c16',
+                            borderRadius: '50%',
+                            width: '32px',
+                            height: '32px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '16px'
+                          }}>
+                            🔗
+                          </div>
+                          <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#fa8c16', textShadow: '0 1px 2px rgba(0,0,0,0.1)' }}>相关词汇</Text>
                         </div>
-                        <Text style={{ 
-                          fontSize: 16, 
-                          lineHeight: 1.6, 
-                          color: '#ad2102',
-                          fontWeight: '500',
-                          display: 'block'
-                        }}>
-                          {related}
-                        </Text>
+                        <div style={{ position: 'relative', zIndex: 1 }}>
+                          <Text style={{ 
+                            fontSize: 17, 
+                            lineHeight: 1.7, 
+                            color: '#d46b08',
+                            fontWeight: '600',
+                            display: 'block',
+                            textShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                          }}>
+                            {related}
+                          </Text>
+                        </div>
                       </div>
                     );
                   }
