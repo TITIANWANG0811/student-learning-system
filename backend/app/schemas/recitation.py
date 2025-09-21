@@ -2,9 +2,13 @@
 默写相关模式
 """
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 from datetime import datetime
 from uuid import UUID
+
+# 导入SubjectResponse以避免循环导入
+if TYPE_CHECKING:
+    from app.schemas.subject import SubjectResponse
 
 
 class RecitationBase(BaseModel):
@@ -54,7 +58,3 @@ class RecitationWithSubject(RecitationResponse):
         from_attributes = True
 
 
-# 导入SubjectResponse以避免循环导入
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    from app.schemas.subject import SubjectResponse

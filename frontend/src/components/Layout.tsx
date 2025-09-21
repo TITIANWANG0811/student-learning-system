@@ -42,6 +42,7 @@ const Layout: React.FC = () => {
   }, [isMobile]);
 
   const menuItems = [
+    // 核心功能 - 直接展示
     {
       key: '/dashboard',
       icon: <DashboardOutlined />,
@@ -58,100 +59,85 @@ const Layout: React.FC = () => {
       label: '学习任务',
     },
     {
-      key: 'notes',
-      icon: <FileTextOutlined />,
-      label: '笔记管理',
-      children: [
-        { key: '/notes/chinese', label: '语文笔记' },
-        { key: '/notes/math', label: '数学笔记' },
-        { key: '/notes/english', label: '英语笔记' },
-        { key: '/notes/history', label: '历史笔记' },
-        { key: '/notes/ethics', label: '道法笔记' },
-      ],
-    },
-    {
-      key: 'assignments',
-      icon: <FileTextOutlined />,
-      label: '作业管理',
-      children: [
-        { key: '/assignments/chinese', label: '语文作业' },
-        { key: '/assignments/math', label: '数学作业' },
-        { key: '/assignments/english', label: '英语作业' },
-        { key: '/assignments/history', label: '历史作业' },
-        { key: '/assignments/ethics', label: '道法作业' },
-      ],
-    },
-    {
-      key: 'practice',
-      icon: <ExperimentOutlined />,
-      label: '练习测试',
-      children: [
-        { key: '/practice/chinese', label: '语文练习' },
-        { key: '/practice/math', label: '数学练习' },
-        { key: '/practice/english', label: '英语练习' },
-        { key: '/practice/history', label: '历史练习' },
-        { key: '/practice/ethics', label: '道法练习' },
-      ],
-    },
-    {
-      key: 'exams',
-      icon: <BarChartOutlined />,
-      label: '考试管理',
-      children: [
-        { key: '/exams/chinese', label: '语文考试' },
-        { key: '/exams/math', label: '数学考试' },
-        { key: '/exams/english', label: '英语考试' },
-        { key: '/exams/history', label: '历史考试' },
-        { key: '/exams/ethics', label: '道法考试' },
-      ],
-    },
-    {
       key: '/progress',
       icon: <BarChartOutlined />,
       label: '学习进度',
     },
+    
+    // 学科分组 - 按学科组织所有功能
     {
-      key: 'mind-maps',
-      icon: <AppstoreOutlined />,
-      label: '思维导图',
+      key: 'chinese',
+      icon: <FileTextOutlined />,
+      label: '语文',
       children: [
-        { key: '/mind-maps/chinese', label: '语文思维导图' },
-        { key: '/mind-maps/math', label: '数学思维导图' },
-        { key: '/mind-maps/english', label: '英语思维导图' },
-        { key: '/mind-maps/history', label: '历史思维导图' },
-        { key: '/mind-maps/ethics', label: '道法思维导图' },
+        { key: '/notes/chinese', label: '笔记' },
+        { key: '/assignments/chinese', label: '作业' },
+        { key: '/practice/chinese', label: '练习' },
+        { key: '/exams/chinese', label: '考试' },
+        { key: '/mind-maps/chinese', label: '思维导图' },
+        { key: '/recitations/chinese', label: '默写背诵' },
+        { key: '/wrong-questions/chinese', label: '错题本' },
       ],
     },
     {
-      key: 'recitations',
-      icon: <PlayCircleOutlined />,
-      label: '默写背诵',
+      key: 'math',
+      icon: <ExperimentOutlined />,
+      label: '数学',
       children: [
-        { key: '/recitations/chinese', label: '语文默写' },
-        { key: '/recitations/math', label: '数学默写' },
-        { key: '/recitations/english', label: '英语默写' },
-        { key: '/recitations/history', label: '历史默写' },
-        { key: '/recitations/ethics', label: '道法默写' },
+        { key: '/notes/math', label: '笔记' },
+        { key: '/assignments/math', label: '作业' },
+        { key: '/practice/math', label: '练习' },
+        { key: '/exams/math', label: '考试' },
+        { key: '/mind-maps/math', label: '思维导图' },
+        { key: '/recitations/math', label: '默写背诵' },
+        { key: '/wrong-questions/math', label: '错题本' },
       ],
     },
     {
-      key: 'wrong-questions',
+      key: 'english',
       icon: <BookOutlined />,
-      label: '错题本',
+      label: '英语',
       children: [
-        { key: '/wrong-questions/chinese', label: '语文错题' },
-        { key: '/wrong-questions/math', label: '数学错题' },
-        { key: '/wrong-questions/english', label: '英语错题' },
-        { key: '/wrong-questions/history', label: '历史错题' },
-        { key: '/wrong-questions/ethics', label: '道法错题' },
+        { key: '/vocabulary', label: '词汇管理' },
+        { key: '/notes/english', label: '笔记' },
+        { key: '/assignments/english', label: '作业' },
+        { key: '/practice/english', label: '练习' },
+        { key: '/exams/english', label: '考试' },
+        { key: '/mind-maps/english', label: '思维导图' },
+        { key: '/recitations/english', label: '默写背诵' },
+        { key: '/wrong-questions/english', label: '错题本' },
       ],
     },
     {
-      key: '/settings',
-      icon: <SettingOutlined />,
-      label: '个人设置',
+      key: 'history',
+      icon: <AppstoreOutlined />,
+      label: '历史',
+      children: [
+        { key: '/notes/history', label: '笔记' },
+        { key: '/assignments/history', label: '作业' },
+        { key: '/practice/history', label: '练习' },
+        { key: '/exams/history', label: '考试' },
+        { key: '/mind-maps/history', label: '思维导图' },
+        { key: '/recitations/history', label: '默写背诵' },
+        { key: '/wrong-questions/history', label: '错题本' },
+      ],
     },
-    // 添加一些额外的菜单项来测试滚动条
+    {
+      key: 'ethics',
+      icon: <PlayCircleOutlined />,
+      label: '道法',
+      children: [
+        { key: '/notes/ethics', label: '笔记' },
+        { key: '/assignments/ethics', label: '作业' },
+        { key: '/practice/ethics', label: '练习' },
+        { key: '/exams/ethics', label: '考试' },
+        { key: '/mind-maps/ethics', label: '思维导图' },
+        { key: '/recitations/ethics', label: '默写背诵' },
+        { key: '/wrong-questions/ethics', label: '错题本' },
+      ],
+    },
+    
+    // 辅助功能
     {
       key: '/reports',
       icon: <BarChartOutlined />,
@@ -168,24 +154,14 @@ const Layout: React.FC = () => {
       label: '学习日历',
     },
     {
-      key: '/resources',
-      icon: <BookOutlined />,
-      label: '学习资源',
+      key: '/settings',
+      icon: <SettingOutlined />,
+      label: '个人设置',
     },
     {
       key: '/help',
       icon: <QuestionCircleOutlined />,
       label: '帮助中心',
-    },
-    {
-      key: '/vocabulary',
-      icon: <BookOutlined />,
-      label: '词汇管理',
-    },
-    {
-      key: '/scroll-test',
-      icon: <BarChartOutlined />,
-      label: '滚动测试',
     },
   ];
 
