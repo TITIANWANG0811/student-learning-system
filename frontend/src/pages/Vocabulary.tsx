@@ -616,28 +616,32 @@ const Vocabulary: React.FC = () => {
                     if (phonetic && (phonetic.includes('/') || phonetic.includes('[') || phonetic.includes(']'))) {
                       sections.push(
                         <div key={`phonetic-${index}`} style={{ 
-                          marginBottom: 20, 
-                          padding: '16px', 
-                          background: 'linear-gradient(135deg, #e6f7ff 0%, #bae7ff 100%)', 
-                          borderRadius: 12,
-                          border: '2px solid #91d5ff',
-                          boxShadow: '0 2px 8px rgba(24, 144, 255, 0.15)'
+                          marginBottom: 16, 
+                          padding: '0', 
+                          background: '#ffffff', 
+                          borderRadius: '8px',
+                          border: '2px solid #e8f5e8',
+                          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                          overflow: 'hidden'
                         }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                            <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#1890ff' }}>音标</Text>
+                          <div style={{ 
+                            padding: '12px 16px',
+                            background: 'linear-gradient(135deg, #4caf50 0%, #2e7d32 100%)',
+                            color: 'white',
+                            fontSize: '14px',
+                            fontWeight: '600'
+                          }}>
+                            🔊 音标
                           </div>
-                          <Text code style={{ 
-                            fontSize: 20, 
-                            fontWeight: 'bold', 
-                            color: '#1890ff',
-                            fontFamily: 'Monaco, Consolas, "Courier New", monospace',
-                            background: 'rgba(24, 144, 255, 0.1)',
-                            padding: '8px 12px',
-                            borderRadius: 6,
-                            display: 'inline-block'
+                          <div style={{ 
+                            padding: '16px',
+                            fontSize: '20px',
+                            fontWeight: 'bold',
+                            color: '#2e7d32',
+                            fontFamily: 'monospace'
                           }}>
                             {phonetic}
-                          </Text>
+                          </div>
                         </div>
                       );
                     }
@@ -665,22 +669,36 @@ const Vocabulary: React.FC = () => {
                     sections.push(
                       <div key={`pos-${index}`} style={{ 
                         marginBottom: 16, 
-                        padding: '12px 16px', 
-                        background: '#f0f9ff', 
-                        borderRadius: 8,
-                        border: '1px solid #91d5ff'
+                        padding: '0', 
+                        background: '#ffffff', 
+                        borderRadius: '8px',
+                        border: '2px solid #fff3e0',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                        overflow: 'hidden'
                       }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                          <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#1890ff' }}>词性</Text>
-                        </div>
-                        <Tag color={getPosColor(pos)} style={{ 
-                          fontSize: 16, 
-                          fontWeight: 'bold', 
-                          padding: '6px 12px',
-                          borderRadius: 20
+                        <div style={{ 
+                          padding: '12px 16px',
+                          background: 'linear-gradient(135deg, #ff9800 0%, #f57c00 100%)',
+                          color: 'white',
+                          fontSize: '14px',
+                          fontWeight: '600'
                         }}>
-                          {pos}
-                        </Tag>
+                          🏷️ 词性
+                        </div>
+                        <div style={{ 
+                          padding: '16px',
+                          display: 'flex',
+                          alignItems: 'center'
+                        }}>
+                          <Tag color={getPosColor(pos)} style={{ 
+                            fontSize: 16, 
+                            fontWeight: 'bold', 
+                            padding: '8px 16px',
+                            borderRadius: 20
+                          }}>
+                            {pos}
+                          </Tag>
+                        </div>
                       </div>
                     );
                   }
@@ -698,25 +716,32 @@ const Vocabulary: React.FC = () => {
                     
                     sections.push(
                       <div key={`meaning-${index}`} style={{ 
-                        marginBottom: 20, 
-                        padding: '20px', 
-                        background: 'linear-gradient(135deg, #fff7e6 0%, #ffd591 100%)', 
-                        borderRadius: 12,
-                        border: '2px solid #ffd591',
-                        boxShadow: '0 2px 8px rgba(250, 173, 20, 0.15)'
+                        marginBottom: 16, 
+                        padding: '0', 
+                        background: '#ffffff', 
+                        borderRadius: '8px',
+                        border: '2px solid #ffebee',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                        overflow: 'hidden'
                       }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                          <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#d46b08' }}>中文释义</Text>
+                        <div style={{ 
+                          padding: '12px 16px',
+                          background: 'linear-gradient(135deg, #f44336 0%, #d32f2f 100%)',
+                          color: 'white',
+                          fontSize: '14px',
+                          fontWeight: '600'
+                        }}>
+                          📖 中文释义
                         </div>
-                        <Text style={{ 
-                          fontSize: 18, 
-                          fontWeight: 'bold', 
-                          color: '#d46b08', 
-                          lineHeight: 1.6,
-                          display: 'block'
+                        <div style={{ 
+                          padding: '16px',
+                          fontSize: '18px',
+                          fontWeight: 'bold',
+                          color: '#d32f2f',
+                          lineHeight: 1.6
                         }}>
                           {meaning}
-                        </Text>
+                        </div>
                       </div>
                     );
                   }
@@ -810,7 +835,7 @@ const Vocabulary: React.FC = () => {
                           display: 'flex', 
                           alignItems: 'center', 
                           padding: '20px 24px',
-                          background: 'linear-gradient(135deg, #2196f3 0%, #1976d2 100%)',
+                          background: 'linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%)',
                           color: 'white'
                         }}>
                           <div style={{
@@ -1020,7 +1045,7 @@ const Vocabulary: React.FC = () => {
                           display: 'flex', 
                           alignItems: 'center', 
                           padding: '20px 24px',
-                          background: 'linear-gradient(135deg, #ff9800 0%, #f57c00 100%)',
+                          background: 'linear-gradient(135deg, #2196f3 0%, #1976d2 100%)',
                           color: 'white'
                         }}>
                           <div style={{
