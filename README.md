@@ -1,6 +1,20 @@
-# 初中生学习管理系统
+# 📚 初中生学习管理系统
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![React 18](https://img.shields.io/badge/React-18-blue.svg)](https://reactjs.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-green.svg)](https://fastapi.tiangolo.com/)
 
 一个专为初中生设计的学习管理系统，帮助孩子完成日常学习复习以及最终考试，帮助家长辅助孩子管理学习。
+
+## 🌟 项目亮点
+
+- 🎯 **多学科支持**：语文、数学、英语、道法、历史全覆盖
+- 📝 **全面学习管理**：教材、笔记、作业、默写、背诵、课外教辅
+- 📊 **智能进度跟踪**：学习计划、任务管理、进度统计
+- 👨‍👩‍👧‍👦 **家长监督功能**：学习报告、进度监控、学习建议
+- 📱 **现代化界面**：响应式设计，支持手机、iPad、桌面多设备访问
+- 🔐 **安全可靠**：JWT认证、数据加密、权限管理
 
 ## 🎯 项目特色
 
@@ -67,8 +81,8 @@ StudentLearningSystem/
 ### 1. 克隆项目
 
 ```bash
-git clone <repository-url>
-cd StudentLearningSystem
+git clone https://github.com/您的用户名/student-learning-system.git
+cd student-learning-system
 ```
 
 ### 2. 数据库设置
@@ -334,9 +348,29 @@ npm test
 - 项目Issues：https://github.com/your-repo/issues
 - 邮箱：your-email@example.com
 
+## 🤝 贡献指南
+
+我们欢迎所有形式的贡献！如果您想为项目做出贡献，请遵循以下步骤：
+
+1. **Fork 项目**
+2. **创建功能分支** (`git checkout -b feature/AmazingFeature`)
+3. **提交更改** (`git commit -m 'Add some AmazingFeature'`)
+4. **推送到分支** (`git push origin feature/AmazingFeature`)
+5. **创建 Pull Request**
+
+## 📝 许可证
+
+本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
+
 ## 🙏 致谢
 
 感谢所有为这个项目做出贡献的开发者和用户！
+
+## 📞 联系我们
+
+- 项目链接: [https://github.com/您的用户名/student-learning-system](https://github.com/您的用户名/student-learning-system)
+- 问题反馈: [Issues](https://github.com/您的用户名/student-learning-system/issues)
+- 功能建议: [Discussions](https://github.com/您的用户名/student-learning-system/discussions)
 
 ---
 
