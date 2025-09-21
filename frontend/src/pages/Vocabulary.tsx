@@ -1008,12 +1008,14 @@ const Vocabulary: React.FC = () => {
                   }
                   
                   // 相关词汇
-                  else if (trimmedLine.includes('**相关词汇**:') || trimmedLine.includes('**近义词**:') || trimmedLine.includes('**反义词**:')) {
+                  else if (trimmedLine.includes('**相关词汇**:') || trimmedLine.includes('**近义词**:') || trimmedLine.includes('**反义词**:') || trimmedLine.includes('[!abstract] 相关词汇')) {
                     const related = trimmedLine
                       .replace(/^>\s*-\s*\*\*相关词汇\*\*:\s*/, '')
                       .replace(/\*\*相关词汇\*\*:\s*/, '')
                       .replace(/\*\*近义词\*\*:\s*/, '')
                       .replace(/\*\*反义词\*\*:\s*/, '')
+                      .replace(/^>\s*\[!abstract\]\s*相关词汇\s*/, '')
+                      .replace(/\[!abstract\]\s*相关词汇\s*/, '')
                       .replace(/>/g, '')
                       .replace(/\*/g, '')
                       .replace(/^[-•]\s*/, '') // 移除列表符号
