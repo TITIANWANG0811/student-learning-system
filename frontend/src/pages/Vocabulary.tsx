@@ -34,32 +34,23 @@ import {
   StarOutlined
 } from '@ant-design/icons';
 import { useResponsive } from '../hooks/useResponsive';
+import { 
+  getGrade1EnglishVocabulary, 
+  importGrade1EnglishVocabulary, 
+  clearGrade1EnglishVocabulary, 
+  getVocabularyStats,
+  updateVocabularyMemorized,
+  VocabularyItem,
+  VocabularyStats
+} from '../services/vocabularyApi';
+import { useAuth } from '../contexts/AuthContext';
 
 const { Title, Text } = Typography;
 const { Search } = Input;
 const { Option } = Select;
 const { TabPane } = Tabs;
 
-interface VocabularyItem {
-  id: string;
-  title: string;
-  content: string;
-  recitation_type: string;
-  difficulty_level: number;
-  is_memorized: boolean;
-  practice_count: number;
-  created_at: string;
-  updated_at: string;
-}
-
-interface VocabularyStats {
-  total_words: number;
-  memorized_words: number;
-  memorization_rate: number;
-  difficulty_stats: Record<string, number>;
-  total_practice_count: number;
-  average_practice_count: number;
-}
+// 接口定义已移动到 vocabularyApi.ts
 
 const Vocabulary: React.FC = () => {
   const [vocabulary, setVocabulary] = useState<VocabularyItem[]>([]);
@@ -70,47 +61,33 @@ const Vocabulary: React.FC = () => {
   const [memorizedFilter, setMemorizedFilter] = useState<boolean | undefined>();
   const [activeTab, setActiveTab] = useState('list');
   const { isMobile } = useResponsive();
+  const { user } = useAuth();
 
-  // 模拟数据 - 实际项目中应该从API获取
+  // 加载真实数据
   useEffect(() => {
-    loadVocabulary();
-    loadStats();
-  }, []);
+    if (user?.id) {
+      loadVocabulary();
+      loadStats();
+    }
+  }, [user?.id]);
+
+  // 当筛选条件改变时重新加载数据
+  useEffect(() => {
+    if (user?.id) {
+      loadVocabulary();
+    }
+  }, [difficultyFilter, memorizedFilter]);
 
   const loadVocabulary = async () => {
     setLoading(true);
     try {
-      // 这里应该调用实际的API
-      // const response = await vocabularyApi.getGrade1English();
-      // setVocabulary(response.data);
-      
-      // 模拟数据
-      const mockData: VocabularyItem[] = [
-        {
-          id: '1',
-          title: 'ready',
-          content: '准备好(做某事)的',
-          recitation_type: 'vocabulary',
-          difficulty_level: 1,
-          is_memorized: true,
-          practice_count: 5,
-          created_at: '2025-01-01T00:00:00Z',
-          updated_at: '2025-01-01T00:00:00Z'
-        },
-        {
-          id: '2',
-          title: 'nervous',
-          content: '紧张的，不安的',
-          recitation_type: 'vocabulary',
-          difficulty_level: 2,
-          is_memorized: false,
-          practice_count: 2,
-          created_at: '2025-01-01T00:00:00Z',
-          updated_at: '2025-01-01T00:00:00Z'
-        }
-      ];
-      setVocabulary(mockData);
+      const response = await getGrade1EnglishVocabulary({
+        difficulty_level: difficultyFilter,
+        is_memorized: memorizedFilter
+      });
+      setVocabulary(response);
     } catch (error) {
+      console.error('加载词汇表失败:', error);
       message.error('加载词汇表失败');
     } finally {
       setLoading(false);
@@ -118,67 +95,64 @@ const Vocabulary: React.FC = () => {
   };
 
   const loadStats = async () => {
+    if (!user?.id) return;
+    
     try {
-      // 这里应该调用实际的API
-      // const response = await vocabularyApi.getStats();
-      // setStats(response.data);
-      
-      // 模拟数据
-      const mockStats: VocabularyStats = {
-        total_words: 321,
-        memorized_words: 156,
-        memorization_rate: 48.6,
-        difficulty_stats: {
-          level_1: 80,
-          level_2: 120,
-          level_3: 80,
-          level_4: 30,
-          level_5: 11
-        },
-        total_practice_count: 1250,
-        average_practice_count: 3.9
-      };
-      setStats(mockStats);
+      const response = await getVocabularyStats(user.id);
+      setStats(response);
     } catch (error) {
+      console.error('加载统计信息失败:', error);
       message.error('加载统计信息失败');
     }
   };
 
   const handleImport = async () => {
+    if (!user?.id) {
+      message.error('请先登录');
+      return;
+    }
+    
     try {
-      // 这里应该调用实际的API
-      // await vocabularyApi.importGrade1English(studentId);
-      message.success('成功导入初一英语单词表！');
+      const response = await importGrade1EnglishVocabulary(user.id);
+      message.success(`成功导入 ${response.imported_count} 个初一英语单词！`);
       loadVocabulary();
       loadStats();
     } catch (error) {
+      console.error('导入失败:', error);
       message.error('导入失败');
     }
   };
 
   const handleClear = async () => {
+    if (!user?.id) {
+      message.error('请先登录');
+      return;
+    }
+    
     try {
-      // 这里应该调用实际的API
-      // await vocabularyApi.clearGrade1English(studentId);
-      message.success('成功清空单词表！');
+      const response = await clearGrade1EnglishVocabulary(user.id);
+      message.success(`成功清空 ${response.deleted_count} 个单词！`);
       loadVocabulary();
       loadStats();
     } catch (error) {
+      console.error('清空失败:', error);
       message.error('清空失败');
     }
   };
 
   const handleMemorize = async (id: string, memorized: boolean) => {
     try {
-      // 这里应该调用实际的API
-      // await vocabularyApi.updateMemorized(id, memorized);
+      await updateVocabularyMemorized(id, memorized);
       setVocabulary(prev => 
         prev.map(item => 
           item.id === id ? { ...item, is_memorized: memorized } : item
         )
       );
       message.success(memorized ? '标记为已背诵' : '标记为未背诵');
+      // 重新加载统计信息
+      loadStats();
     } catch (error) {
+      console.error('更新失败:', error);
       message.error('更新失败');
     }
   };
