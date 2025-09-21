@@ -735,26 +735,21 @@ const Vocabulary: React.FC = () => {
                     
                     sections.push(
                       <div key={`example-${index}`} style={{ 
-                        marginBottom: 16, 
-                        padding: '18px', 
-                        background: 'linear-gradient(135deg, #f0f9ff 0%, #bae7ff 100%)', 
-                        borderRadius: 10,
-                        border: '2px solid #69c0ff',
-                        boxShadow: '0 2px 8px rgba(24, 144, 255, 0.1)'
+                        marginBottom: 12, 
+                        padding: '12px', 
+                        background: '#ffffff', 
+                        borderRadius: '6px',
+                        border: '1px solid #dee2e6',
+                        fontSize: '14px',
+                        lineHeight: '1.6',
+                        color: '#495057'
                       }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-                          <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#1890ff' }}>💬 例句</Text>
+                        <div style={{ fontWeight: '600', color: '#6c757d', marginBottom: '4px' }}>
+                          例句：
                         </div>
-                        <Text style={{ 
-                          fontSize: 16, 
-                          fontStyle: 'italic', 
-                          lineHeight: 1.6, 
-                          color: '#003a8c',
-                          fontWeight: '500',
-                          display: 'block'
-                        }}>
+                        <div style={{ fontStyle: 'italic' }}>
                           {example}
-                        </Text>
+                        </div>
                       </div>
                     );
                   }
@@ -771,53 +766,61 @@ const Vocabulary: React.FC = () => {
                       .replace(/#[a-zA-Z0-9\-/]+/g, '') // 移除标签如 #mcl/list-card
                       .trim();
                     
+                    // 解析联想记忆内容，按方法分类显示
+                    const memoryLines = memory.split('\n').filter(line => line.trim());
+                    const splitMethod = memoryLines.find(line => line.includes('拆分记忆法'));
+                    const scenarioMethod = memoryLines.find(line => line.includes('场景记忆法'));
+                    const splitContent = memoryLines.filter((line, i) => {
+                      const prevLine = memoryLines[i - 1];
+                      return prevLine && prevLine.includes('拆分记忆法') && !line.includes('场景记忆法');
+                    });
+                    const scenarioContent = memoryLines.filter((line, i) => {
+                      const prevLine = memoryLines[i - 1];
+                      return prevLine && prevLine.includes('场景记忆法');
+                    });
+
                     sections.push(
                       <div key={`memory-${index}`} style={{ 
-                        marginBottom: 24, 
-                        padding: '24px', 
-                        background: 'linear-gradient(135deg, #e6f7ff 0%, #bae7ff 50%, #91d5ff 100%)', 
-                        borderRadius: 16,
-                        border: '3px solid #1890ff',
-                        boxShadow: '0 8px 24px rgba(24, 144, 255, 0.25), 0 4px 8px rgba(24, 144, 255, 0.15)',
-                        position: 'relative',
-                        overflow: 'hidden'
+                        marginBottom: 20, 
+                        padding: '20px', 
+                        background: '#f8f9fa', 
+                        borderRadius: 8,
+                        border: '1px solid #e9ecef'
                       }}>
-                        <div style={{
-                          position: 'absolute',
-                          top: 0,
-                          right: 0,
-                          width: '60px',
-                          height: '60px',
-                          background: 'rgba(24, 144, 255, 0.1)',
-                          borderRadius: '0 16px 0 60px',
-                          zIndex: 0
-                        }} />
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, position: 'relative', zIndex: 1 }}>
-                          <div style={{
-                            background: '#1890ff',
-                            borderRadius: '50%',
-                            width: '32px',
-                            height: '32px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontSize: '16px'
-                          }}>
-                            🧠
-                          </div>
-                          <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#1890ff', textShadow: '0 1px 2px rgba(0,0,0,0.1)' }}>联想记忆</Text>
-                        </div>
-                        <div style={{ position: 'relative', zIndex: 1 }}>
-                          <Text style={{ 
-                            fontSize: 17, 
-                            lineHeight: 1.7, 
-                            color: '#003a8c',
-                            fontWeight: '600',
-                            display: 'block',
-                            textShadow: '0 1px 2px rgba(0,0,0,0.05)'
-                          }}>
-                            {memory}
+                        <div style={{ marginBottom: 16 }}>
+                          <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#495057', marginBottom: 12, display: 'block' }}>
+                            联想记忆
                           </Text>
+                          
+                          {splitMethod && splitContent.length > 0 && (
+                            <div style={{ marginBottom: 16 }}>
+                              <Text style={{ fontSize: 14, fontWeight: '600', color: '#6c757d', marginBottom: 8, display: 'block' }}>
+                                拆分记忆法：
+                              </Text>
+                              <div style={{ paddingLeft: 16 }}>
+                                {splitContent.map((item, idx) => (
+                                  <div key={idx} style={{ marginBottom: 6, fontSize: 14, lineHeight: 1.5, color: '#495057' }}>
+                                    • {item.replace(/^[-•]\s*/, '').trim()}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {scenarioMethod && scenarioContent.length > 0 && (
+                            <div>
+                              <Text style={{ fontSize: 14, fontWeight: '600', color: '#6c757d', marginBottom: 8, display: 'block' }}>
+                                场景记忆法：
+                              </Text>
+                              <div style={{ paddingLeft: 16 }}>
+                                {scenarioContent.map((item, idx) => (
+                                  <div key={idx} style={{ marginBottom: 6, fontSize: 14, lineHeight: 1.5, color: '#495057' }}>
+                                    • {item.replace(/^[-•]\s*/, '').trim()}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
                     );
@@ -836,53 +839,114 @@ const Vocabulary: React.FC = () => {
                       .replace(/#[a-zA-Z0-9\-/]+/g, '') // 移除标签如 #mcl/list-card
                       .trim();
                     
+                    // 解析相关词汇内容，按类型分类显示
+                    const relatedLines = related.split('\n').filter(line => line.trim());
+                    const synonyms = relatedLines.find(line => line.includes('近义词:'));
+                    const antonyms = relatedLines.find(line => line.includes('反义词:'));
+                    const derivatives = relatedLines.find(line => line.includes('派生词:'));
+                    const phrases = relatedLines.find(line => line.includes('相关短语'));
+                    
+                    const synonymWords = synonyms ? synonyms.replace('近义词:', '').split(',').map(w => w.trim()).filter(w => w) : [];
+                    const antonymWords = antonyms ? antonyms.replace('反义词:', '').split(',').map(w => w.trim()).filter(w => w) : [];
+                    const derivativeWords = derivatives ? derivatives.replace('派生词:', '').split(',').map(w => w.trim()).filter(w => w) : [];
+                    const phraseContent = relatedLines.filter((line, i) => {
+                      const prevLine = relatedLines[i - 1];
+                      return prevLine && prevLine.includes('相关短语');
+                    });
+
                     sections.push(
                       <div key={`related-${index}`} style={{ 
-                        marginBottom: 24, 
-                        padding: '24px', 
-                        background: 'linear-gradient(135deg, #fff7e6 0%, #ffd591 50%, #ffa940 100%)', 
-                        borderRadius: 16,
-                        border: '3px solid #fa8c16',
-                        boxShadow: '0 8px 24px rgba(250, 140, 22, 0.25), 0 4px 8px rgba(250, 140, 22, 0.15)',
-                        position: 'relative',
-                        overflow: 'hidden'
+                        marginBottom: 20, 
+                        padding: '20px', 
+                        background: '#f8f9fa', 
+                        borderRadius: 8,
+                        border: '1px solid #e9ecef'
                       }}>
-                        <div style={{
-                          position: 'absolute',
-                          top: 0,
-                          right: 0,
-                          width: '60px',
-                          height: '60px',
-                          background: 'rgba(250, 140, 22, 0.1)',
-                          borderRadius: '0 16px 0 60px',
-                          zIndex: 0
-                        }} />
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, position: 'relative', zIndex: 1 }}>
-                          <div style={{
-                            background: '#fa8c16',
-                            borderRadius: '50%',
-                            width: '32px',
-                            height: '32px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontSize: '16px'
-                          }}>
-                            🔗
-                          </div>
-                          <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#fa8c16', textShadow: '0 1px 2px rgba(0,0,0,0.1)' }}>相关词汇</Text>
-                        </div>
-                        <div style={{ position: 'relative', zIndex: 1 }}>
-                          <Text style={{ 
-                            fontSize: 17, 
-                            lineHeight: 1.7, 
-                            color: '#d46b08',
-                            fontWeight: '600',
-                            display: 'block',
-                            textShadow: '0 1px 2px rgba(0,0,0,0.05)'
-                          }}>
-                            {related}
+                        <div style={{ marginBottom: 16 }}>
+                          <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#495057', marginBottom: 12, display: 'block' }}>
+                            相关词汇
                           </Text>
+                          
+                          {synonymWords.length > 0 && (
+                            <div style={{ marginBottom: 12 }}>
+                              <Text style={{ fontSize: 14, fontWeight: '600', color: '#6c757d', marginBottom: 6, display: 'block' }}>
+                                近义词：
+                              </Text>
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                                {synonymWords.map((word, idx) => (
+                                  <span key={idx} style={{ 
+                                    background: '#e3f2fd', 
+                                    color: '#1976d2', 
+                                    padding: '2px 8px', 
+                                    borderRadius: '4px', 
+                                    fontSize: '13px',
+                                    border: '1px solid #bbdefb'
+                                  }}>
+                                    {word}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {antonymWords.length > 0 && (
+                            <div style={{ marginBottom: 12 }}>
+                              <Text style={{ fontSize: 14, fontWeight: '600', color: '#6c757d', marginBottom: 6, display: 'block' }}>
+                                反义词：
+                              </Text>
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                                {antonymWords.map((word, idx) => (
+                                  <span key={idx} style={{ 
+                                    background: '#ffebee', 
+                                    color: '#d32f2f', 
+                                    padding: '2px 8px', 
+                                    borderRadius: '4px', 
+                                    fontSize: '13px',
+                                    border: '1px solid #ffcdd2'
+                                  }}>
+                                    {word}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {derivativeWords.length > 0 && (
+                            <div style={{ marginBottom: 12 }}>
+                              <Text style={{ fontSize: 14, fontWeight: '600', color: '#6c757d', marginBottom: 6, display: 'block' }}>
+                                派生词：
+                              </Text>
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                                {derivativeWords.map((word, idx) => (
+                                  <span key={idx} style={{ 
+                                    background: '#f3e5f5', 
+                                    color: '#7b1fa2', 
+                                    padding: '2px 8px', 
+                                    borderRadius: '4px', 
+                                    fontSize: '13px',
+                                    border: '1px solid #e1bee7'
+                                  }}>
+                                    {word}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {phraseContent.length > 0 && (
+                            <div>
+                              <Text style={{ fontSize: 14, fontWeight: '600', color: '#6c757d', marginBottom: 6, display: 'block' }}>
+                                相关短语：
+                              </Text>
+                              <div style={{ paddingLeft: 16 }}>
+                                {phraseContent.map((item, idx) => (
+                                  <div key={idx} style={{ marginBottom: 4, fontSize: 14, lineHeight: 1.5, color: '#495057' }}>
+                                    • {item.replace(/^[-•]\s*/, '').trim()}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
                     );
