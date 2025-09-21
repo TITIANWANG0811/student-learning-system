@@ -511,7 +511,12 @@ const Vocabulary: React.FC = () => {
 
       {/* 单词详情模态框 */}
       <Modal
-        title={selectedWord ? `${selectedWord.title} - 单词详情` : ''}
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <BookOutlined style={{ color: '#1890ff', fontSize: 20 }} />
+            <span>{selectedWord ? `${selectedWord.title} - 单词详情` : '单词详情'}</span>
+          </div>
+        }
         open={wordDetailVisible}
         onCancel={closeWordDetail}
         footer={[
@@ -532,117 +537,338 @@ const Vocabulary: React.FC = () => {
             </Button>
           )
         ]}
-        width={isMobile ? '95%' : isTablet ? '80%' : 600}
+        width={isMobile ? '95%' : isTablet ? '85%' : 700}
         style={{ top: 20 }}
+        styles={{ body: { padding: 0 } }}
       >
         {selectedWord && (
-          <div style={{ maxHeight: '70vh', overflowY: 'auto' }}>
-            {/* 单词基本信息 */}
-            <div style={{ marginBottom: 20, padding: '16px', background: '#f6f8fa', borderRadius: 8 }}>
-              <div style={{ marginBottom: 12 }}>
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-                  <Text strong style={{ fontSize: 24, color: '#1890ff' }}>
+          <div style={{ maxHeight: '75vh', overflowY: 'auto' }}>
+            {/* 单词头部信息 */}
+            <div style={{ 
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', 
+              color: 'white', 
+              padding: '24px', 
+              marginBottom: 0,
+              borderRadius: '6px 6px 0 0'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
+                <div>
+                  <h1 style={{ 
+                    fontSize: 32, 
+                    fontWeight: 'bold', 
+                    margin: 0, 
+                    color: 'white',
+                    textShadow: '0 2px 4px rgba(0,0,0,0.3)'
+                  }}>
                     {selectedWord.title}
-                  </Text>
-                  <Tag color={selectedWord.is_memorized ? 'green' : 'blue'}>
-                    {selectedWord.is_memorized ? '已背诵' : '未背诵'}
-                  </Tag>
+                  </h1>
+                  <div style={{ display: 'flex', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
+                    <Tag color="white" style={{ color: '#667eea', fontWeight: 'bold' }}>
+                      {selectedWord.vocabulary_type === 'word' ? '单词' : 
+                       selectedWord.vocabulary_type === 'proper_name' ? '人名' :
+                       selectedWord.vocabulary_type === 'proper_place' ? '地名' : '其他'}
+                    </Tag>
+                    <Tag color={selectedWord.is_memorized ? 'green' : 'orange'} style={{ fontWeight: 'bold' }}>
+                      {selectedWord.is_memorized ? '已背诵' : '未背诵'}
+                    </Tag>
+                    {selectedWord.unit_name && (
+                      <Tag color="blue" style={{ fontWeight: 'bold' }}>
+                        {selectedWord.unit_name}
+                      </Tag>
+                    )}
+                  </div>
                 </div>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Text type="secondary" style={{ fontSize: 14 }}>
-                  练习次数: {selectedWord.practice_count}
-                </Text>
-                <Text type="secondary" style={{ fontSize: 12 }}>
-                  创建: {new Date(selectedWord.created_at).toLocaleDateString()}
-                </Text>
+                <div style={{ textAlign: 'right', color: 'rgba(255,255,255,0.8)' }}>
+                  <div style={{ fontSize: 14, marginBottom: 4 }}>
+                    练习次数: <strong>{selectedWord.practice_count}</strong>
+                  </div>
+                  <div style={{ fontSize: 12 }}>
+                    {new Date(selectedWord.created_at).toLocaleDateString()}
+                  </div>
+                </div>
               </div>
             </div>
 
             {/* 单词详细内容 */}
-            <div style={{ marginBottom: 20 }}>
-              {selectedWord.content.split('\n').map((line, index) => {
-                const trimmedLine = line.trim();
+            <div style={{ padding: '24px' }}>
+              {(() => {
+                const lines = selectedWord.content.split('\n');
+                const sections: React.ReactNode[] = [];
+                let currentSection = null;
                 
-                if (!trimmedLine) {
-                  return <div key={index} style={{ height: 8 }} />;
-                }
+                lines.forEach((line, index) => {
+                  const trimmedLine = line.trim();
+                  if (!trimmedLine) return;
+                  
+                  // 音标
+                  if (trimmedLine.includes('**音标**:') || (trimmedLine.includes('/') && !trimmedLine.includes('http') && !trimmedLine.includes('#'))) {
+                    const phonetic = trimmedLine
+                      .replace(/^>\s*-\s*\*\*音标\*\*:\s*/, '')
+                      .replace(/\*\*音标\*\*:\s*/, '')
+                      .replace(/>/g, '')
+                      .replace(/\*/g, '')
+                      .replace(/^[-•]\s*/, '') // 移除列表符号
+                      .replace(/#[a-zA-Z0-9\-/]+/g, '') // 移除标签如 #mcl/list-card
+                      .replace(/^#+\s*/, '') // 移除Markdown标题符号
+                      .trim();
+                    
+                    // 只有当音标不为空且包含音标符号时才显示
+                    if (phonetic && (phonetic.includes('/') || phonetic.includes('[') || phonetic.includes(']'))) {
+                      sections.push(
+                        <div key={`phonetic-${index}`} style={{ 
+                          marginBottom: 20, 
+                          padding: '16px', 
+                          background: 'linear-gradient(135deg, #e6f7ff 0%, #bae7ff 100%)', 
+                          borderRadius: 12,
+                          border: '2px solid #91d5ff',
+                          boxShadow: '0 2px 8px rgba(24, 144, 255, 0.15)'
+                        }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                            <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#1890ff' }}>音标</Text>
+                          </div>
+                          <Text code style={{ 
+                            fontSize: 20, 
+                            fontWeight: 'bold', 
+                            color: '#1890ff',
+                            fontFamily: 'Monaco, Consolas, "Courier New", monospace',
+                            background: 'rgba(24, 144, 255, 0.1)',
+                            padding: '8px 12px',
+                            borderRadius: 6,
+                            display: 'inline-block'
+                          }}>
+                            {phonetic}
+                          </Text>
+                        </div>
+                      );
+                    }
+                  }
+                  
+                  // 词性
+                  else if (trimmedLine.includes('**词性**:')) {
+                    const pos = trimmedLine
+                      .replace(/^>\s*-\s*\*\*词性\*\*:\s*/, '')
+                      .replace(/\*\*词性\*\*:\s*/, '')
+                      .replace(/>/g, '')
+                      .replace(/\*/g, '')
+                      .replace(/^[-•]\s*/, '') // 移除列表符号
+                      .replace(/#[a-zA-Z0-9\-/]+/g, '') // 移除标签如 #mcl/list-card
+                      .trim();
+                    
+                    const getPosColor = (posText: string) => {
+                      if (posText.includes('n.') || posText.includes('名词')) return '#1890ff';
+                      if (posText.includes('v.') || posText.includes('动词')) return '#52c41a';
+                      if (posText.includes('adj.') || posText.includes('形容词')) return '#fa8c16';
+                      if (posText.includes('adv.') || posText.includes('副词')) return '#722ed1';
+                      return '#1890ff';
+                    };
+                    
+                    sections.push(
+                      <div key={`pos-${index}`} style={{ 
+                        marginBottom: 16, 
+                        padding: '12px 16px', 
+                        background: '#f0f9ff', 
+                        borderRadius: 8,
+                        border: '1px solid #91d5ff'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                          <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#1890ff' }}>词性</Text>
+                        </div>
+                        <Tag color={getPosColor(pos)} style={{ 
+                          fontSize: 16, 
+                          fontWeight: 'bold', 
+                          padding: '6px 12px',
+                          borderRadius: 20
+                        }}>
+                          {pos}
+                        </Tag>
+                      </div>
+                    );
+                  }
+                  
+                  // 中文释义
+                  else if (trimmedLine.includes('**中文释义**:')) {
+                    const meaning = trimmedLine
+                      .replace(/^>\s*-\s*\*\*中文释义\*\*:\s*/, '')
+                      .replace(/\*\*中文释义\*\*:\s*/, '')
+                      .replace(/>/g, '')
+                      .replace(/\*/g, '')
+                      .replace(/^[-•]\s*/, '') // 移除列表符号
+                      .replace(/#[a-zA-Z0-9\-/]+/g, '') // 移除标签如 #mcl/list-card
+                      .trim();
+                    
+                    sections.push(
+                      <div key={`meaning-${index}`} style={{ 
+                        marginBottom: 20, 
+                        padding: '20px', 
+                        background: 'linear-gradient(135deg, #fff7e6 0%, #ffd591 100%)', 
+                        borderRadius: 12,
+                        border: '2px solid #ffd591',
+                        boxShadow: '0 2px 8px rgba(250, 173, 20, 0.15)'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                          <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#d46b08' }}>中文释义</Text>
+                        </div>
+                        <Text style={{ 
+                          fontSize: 18, 
+                          fontWeight: 'bold', 
+                          color: '#d46b08', 
+                          lineHeight: 1.6,
+                          display: 'block'
+                        }}>
+                          {meaning}
+                        </Text>
+                      </div>
+                    );
+                  }
+                  
+                  // 例句
+                  else if (trimmedLine.includes('**例句**:') || /^\d+\./.test(trimmedLine) || /^[A-Z][a-z].*\./.test(trimmedLine) || /^>\s*\d+\./.test(trimmedLine)) {
+                    const example = trimmedLine
+                      .replace(/^>\s*-\s*\*\*例句\*\*:\s*/, '')
+                      .replace(/\*\*例句\*\*:\s*/, '')
+                      .replace(/>/g, '')
+                      .replace(/\*/g, '')
+                      .replace(/^[-•]\s*/, '') // 移除列表符号
+                      .replace(/^\d+\.\s*/, '') // 移除数字编号
+                      .replace(/#[a-zA-Z0-9\-/]+/g, '') // 移除标签如 #mcl/list-card
+                      .trim();
+                    
+                    sections.push(
+                      <div key={`example-${index}`} style={{ 
+                        marginBottom: 16, 
+                        padding: '16px', 
+                        background: '#f0f9ff', 
+                        borderRadius: 8,
+                        border: '1px solid #91d5ff'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                          <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#1890ff' }}>例句</Text>
+                        </div>
+                        <Text style={{ 
+                          fontSize: 16, 
+                          fontStyle: 'italic', 
+                          lineHeight: 1.6, 
+                          color: '#003a8c',
+                          display: 'block'
+                        }}>
+                          {example}
+                        </Text>
+                      </div>
+                    );
+                  }
+                  
+                  // 联想记忆
+                  else if (trimmedLine.includes('**联想记忆**:') || trimmedLine.includes('**记忆**:')) {
+                    const memory = trimmedLine
+                      .replace(/^>\s*-\s*\*\*联想记忆\*\*:\s*/, '')
+                      .replace(/\*\*联想记忆\*\*:\s*/, '')
+                      .replace(/\*\*记忆\*\*:\s*/, '')
+                      .replace(/>/g, '')
+                      .replace(/\*/g, '')
+                      .replace(/^[-•]\s*/, '') // 移除列表符号
+                      .replace(/#[a-zA-Z0-9\-/]+/g, '') // 移除标签如 #mcl/list-card
+                      .trim();
+                    
+                    sections.push(
+                      <div key={`memory-${index}`} style={{ 
+                        marginBottom: 16, 
+                        padding: '16px', 
+                        background: '#f6ffed', 
+                        borderRadius: 8,
+                        border: '1px solid #b7eb8f'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                          <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#389e0d' }}>联想记忆</Text>
+                        </div>
+                        <Text style={{ 
+                          fontSize: 15, 
+                          lineHeight: 1.6, 
+                          color: '#389e0d',
+                          display: 'block'
+                        }}>
+                          {memory}
+                        </Text>
+                      </div>
+                    );
+                  }
+                  
+                  // 相关词汇
+                  else if (trimmedLine.includes('**相关词汇**:') || trimmedLine.includes('**近义词**:') || trimmedLine.includes('**反义词**:')) {
+                    const related = trimmedLine
+                      .replace(/^>\s*-\s*\*\*相关词汇\*\*:\s*/, '')
+                      .replace(/\*\*相关词汇\*\*:\s*/, '')
+                      .replace(/\*\*近义词\*\*:\s*/, '')
+                      .replace(/\*\*反义词\*\*:\s*/, '')
+                      .replace(/>/g, '')
+                      .replace(/\*/g, '')
+                      .replace(/^[-•]\s*/, '') // 移除列表符号
+                      .replace(/#[a-zA-Z0-9\-/]+/g, '') // 移除标签如 #mcl/list-card
+                      .trim();
+                    
+                    sections.push(
+                      <div key={`related-${index}`} style={{ 
+                        marginBottom: 16, 
+                        padding: '16px', 
+                        background: '#fff2e8', 
+                        borderRadius: 8,
+                        border: '1px solid #ffbb96'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                          <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#d4380d' }}>相关词汇</Text>
+                        </div>
+                        <Text style={{ 
+                          fontSize: 15, 
+                          lineHeight: 1.6, 
+                          color: '#d4380d',
+                          display: 'block'
+                        }}>
+                          {related}
+                        </Text>
+                      </div>
+                    );
+                  }
+                  
+                  // 其他信息
+                  else {
+                    const cleanText = trimmedLine
+                      .replace(/>/g, '')
+                      .replace(/\*/g, '')
+                      .replace(/^[-•]\s*/, '') // 移除列表符号
+                      .replace(/^\d+\.\s*/, '') // 移除数字编号
+                      .replace(/#[a-zA-Z0-9\-/]+/g, '') // 移除标签如 #mcl/list-card
+                      .replace(/^#+\s*/, '') // 移除Markdown标题符号
+                      .replace(/^\[!info\]\s*/, '') // 移除信息框标记
+                      .replace(/^\[!note\]\s*/, '') // 移除笔记标记
+                      .replace(/^\[!tip\]\s*/, '') // 移除提示标记
+                      .replace(/^\[!warning\]\s*/, '') // 移除警告标记
+                      .trim();
+                    
+                    // 跳过空行、只有符号的行和标题行
+                    if (!cleanText || cleanText.length < 2 || cleanText.startsWith('英语单词学习卡片') || cleanText.startsWith('单词信息')) return;
+                    
+                    sections.push(
+                      <div key={`other-${index}`} style={{ 
+                        marginBottom: 12, 
+                        padding: '12px 16px', 
+                        background: '#fafafa', 
+                        borderRadius: 6,
+                        border: '1px solid #d9d9d9'
+                      }}>
+                        <Text style={{ 
+                          fontSize: 15, 
+                          lineHeight: 1.5, 
+                          color: '#595959',
+                          display: 'block'
+                        }}>
+                          {cleanText}
+                        </Text>
+                      </div>
+                    );
+                  }
+                });
                 
-                // 音标
-                if (trimmedLine.includes('音标:') || (trimmedLine.includes('/') && !trimmedLine.includes('http'))) {
-                  return (
-                    <div key={index} style={{ marginBottom: 16, padding: '12px', background: '#e6f7ff', borderRadius: 6 }}>
-                      <Text type="secondary" style={{ fontSize: 18, fontWeight: 'bold', color: '#1890ff' }}>
-                        {trimmedLine}
-                      </Text>
-                    </div>
-                  );
-                }
-                
-                // 词性
-                if (trimmedLine.includes('词性:') || trimmedLine.includes('形容词') || trimmedLine.includes('名词') || trimmedLine.includes('动词') || trimmedLine.includes('副词')) {
-                  return (
-                    <div key={index} style={{ marginBottom: 14, padding: '8px 12px', background: '#f0f9ff', borderRadius: 4 }}>
-                      <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#0050b3' }}>
-                        {trimmedLine}
-                      </Text>
-                    </div>
-                  );
-                }
-                
-                // 中文释义
-                if (trimmedLine.includes('中文释义:') || trimmedLine.includes('释义:') || trimmedLine.includes('中文意思:')) {
-                  return (
-                    <div key={index} style={{ marginBottom: 18, padding: '16px', background: '#fff7e6', borderRadius: 8, border: '2px solid #ffd591' }}>
-                      <Text strong style={{ fontSize: 20, color: '#d46b08', lineHeight: 1.4 }}>
-                        {trimmedLine}
-                      </Text>
-                    </div>
-                  );
-                }
-                
-                // 例句
-                if (trimmedLine.includes('例句:') || /^\d+\./.test(trimmedLine) || /[A-Z][a-z].*\./.test(trimmedLine)) {
-                  return (
-                    <div key={index} style={{ marginBottom: 12, padding: '10px 12px', background: '#f0f9ff', borderRadius: 6 }}>
-                      <Text style={{ fontSize: 16, fontStyle: 'italic', lineHeight: 1.6, color: '#003a8c' }}>
-                        {trimmedLine}
-                      </Text>
-                    </div>
-                  );
-                }
-                
-                // 联想记忆
-                if (trimmedLine.includes('联想记忆:') || trimmedLine.includes('记忆:') || trimmedLine.includes('记忆方法:')) {
-                  return (
-                    <div key={index} style={{ marginBottom: 12, padding: '10px 12px', background: '#f6ffed', borderRadius: 6 }}>
-                      <Text type="secondary" style={{ fontSize: 15, lineHeight: 1.6, color: '#389e0d' }}>
-                        {trimmedLine}
-                      </Text>
-                    </div>
-                  );
-                }
-                
-                // 相关词汇
-                if (trimmedLine.includes('相关词汇:') || trimmedLine.includes('近义词') || trimmedLine.includes('反义词') || trimmedLine.includes('派生词')) {
-                  return (
-                    <div key={index} style={{ marginBottom: 12, padding: '10px 12px', background: '#fff2e8', borderRadius: 6 }}>
-                      <Text type="secondary" style={{ fontSize: 15, lineHeight: 1.6, color: '#d4380d' }}>
-                        {trimmedLine}
-                      </Text>
-                    </div>
-                  );
-                }
-                
-                // 其他信息
-                return (
-                  <div key={index} style={{ marginBottom: 10, padding: '8px 12px', background: '#fafafa', borderRadius: 4 }}>
-                    <Text style={{ fontSize: 15, lineHeight: 1.5, color: '#595959' }}>
-                      {trimmedLine}
-                    </Text>
-                  </div>
-                );
-              })}
+                return sections;
+              })()}
             </div>
           </div>
         )}
