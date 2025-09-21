@@ -1,0 +1,320 @@
+/* 响应式设计样式 */
+
+/* 移动端样式 (手机) */
+@media (max-width: 767px) {
+  /* 全局样式调整 */
+  .ant-layout {
+    font-size: 14px;
+  }
+  
+  /* 卡片间距调整 */
+  .ant-card {
+    margin-bottom: 12px;
+  }
+  
+  /* 表格响应式 */
+  .ant-table-wrapper {
+    overflow-x: auto;
+  }
+  
+  .ant-table {
+    font-size: 12px;
+  }
+  
+  .ant-table-thead > tr > th {
+    padding: 8px 4px;
+    font-size: 12px;
+  }
+  
+  .ant-table-tbody > tr > td {
+    padding: 8px 4px;
+    font-size: 12px;
+  }
+  
+  /* 按钮组调整 */
+  .ant-btn {
+    font-size: 12px;
+    height: 32px;
+    padding: 4px 8px;
+  }
+  
+  .ant-btn-sm {
+    height: 24px;
+    padding: 0 6px;
+    font-size: 11px;
+  }
+  
+  /* 表单调整 */
+  .ant-form-item {
+    margin-bottom: 16px;
+  }
+  
+  .ant-form-item-label {
+    padding-bottom: 4px;
+  }
+  
+  .ant-input,
+  .ant-select,
+  .ant-picker {
+    font-size: 14px;
+    height: 36px;
+  }
+  
+  /* 统计卡片调整 */
+  .ant-statistic-title {
+    font-size: 12px;
+  }
+  
+  .ant-statistic-content {
+    font-size: 18px;
+  }
+  
+  /* 进度条调整 */
+  .ant-progress-text {
+    font-size: 11px;
+  }
+  
+  /* 标签调整 */
+  .ant-tag {
+    font-size: 11px;
+    padding: 2px 6px;
+  }
+  
+  /* 分页调整 */
+  .ant-pagination {
+    text-align: center;
+  }
+  
+  .ant-pagination-item,
+  .ant-pagination-prev,
+  .ant-pagination-next {
+    min-width: 28px;
+    height: 28px;
+    line-height: 26px;
+    font-size: 12px;
+  }
+  
+  /* 抽屉调整 */
+  .ant-drawer-body {
+    padding: 16px;
+  }
+  
+  /* 模态框调整 */
+  .ant-modal {
+    margin: 16px;
+  }
+  
+  .ant-modal-body {
+    padding: 16px;
+  }
+  
+  /* 空状态调整 */
+  .ant-empty {
+    margin: 24px 0;
+  }
+  
+  .ant-empty-description {
+    font-size: 12px;
+  }
+}
+
+/* 平板样式 (iPad) */
+@media (min-width: 768px) and (max-width: 1024px) {
+  /* 全局样式调整 */
+  .ant-layout {
+    font-size: 15px;
+  }
+  
+  /* 卡片间距调整 */
+  .ant-card {
+    margin-bottom: 16px;
+  }
+  
+  /* 表格调整 */
+  .ant-table {
+    font-size: 13px;
+  }
+  
+  .ant-table-thead > tr > th {
+    padding: 12px 8px;
+    font-size: 13px;
+  }
+  
+  .ant-table-tbody > tr > td {
+    padding: 12px 8px;
+    font-size: 13px;
+  }
+  
+  /* 按钮调整 */
+  .ant-btn {
+    font-size: 13px;
+    height: 36px;
+    padding: 6px 12px;
+  }
+  
+  .ant-btn-sm {
+    height: 28px;
+    padding: 2px 8px;
+    font-size: 12px;
+  }
+  
+  /* 表单调整 */
+  .ant-form-item {
+    margin-bottom: 20px;
+  }
+  
+  .ant-input,
+  .ant-select,
+  .ant-picker {
+    font-size: 15px;
+    height: 40px;
+  }
+  
+  /* 统计卡片调整 */
+  .ant-statistic-title {
+    font-size: 13px;
+  }
+  
+  .ant-statistic-content {
+    font-size: 20px;
+  }
+  
+  /* 进度条调整 */
+  .ant-progress-text {
+    font-size: 12px;
+  }
+  
+  /* 标签调整 */
+  .ant-tag {
+    font-size: 12px;
+    padding: 3px 8px;
+  }
+}
+
+/* 大屏幕样式 (桌面) */
+@media (min-width: 1025px) {
+  /* 保持默认样式 */
+}
+
+/* 通用响应式工具类 */
+.mobile-only {
+  display: none;
+}
+
+.tablet-only {
+  display: none;
+}
+
+.desktop-only {
+  display: block;
+}
+
+@media (max-width: 767px) {
+  .mobile-only {
+    display: block;
+  }
+  
+  .desktop-only {
+    display: none;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  .tablet-only {
+    display: block;
+  }
+  
+  .desktop-only {
+    display: none;
+  }
+}
+
+/* 响应式网格 */
+.responsive-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .responsive-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .responsive-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1200px) {
+  .responsive-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* 响应式文本 */
+.responsive-text-xs {
+  font-size: 10px;
+}
+
+.responsive-text-sm {
+  font-size: 12px;
+}
+
+.responsive-text-base {
+  font-size: 14px;
+}
+
+.responsive-text-lg {
+  font-size: 16px;
+}
+
+.responsive-text-xl {
+  font-size: 18px;
+}
+
+@media (min-width: 768px) {
+  .responsive-text-xs {
+    font-size: 11px;
+  }
+  
+  .responsive-text-sm {
+    font-size: 13px;
+  }
+  
+  .responsive-text-base {
+    font-size: 15px;
+  }
+  
+  .responsive-text-lg {
+    font-size: 17px;
+  }
+  
+  .responsive-text-xl {
+    font-size: 19px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .responsive-text-xs {
+    font-size: 12px;
+  }
+  
+  .responsive-text-sm {
+    font-size: 14px;
+  }
+  
+  .responsive-text-base {
+    font-size: 16px;
+  }
+  
+  .responsive-text-lg {
+    font-size: 18px;
+  }
+  
+  .responsive-text-xl {
+    font-size: 20px;
+  }
+}
