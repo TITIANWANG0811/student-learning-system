@@ -770,37 +770,98 @@ const Vocabulary: React.FC = () => {
                     const memoryLines = memory.split('\n').filter(line => line.trim());
                     const splitMethod = memoryLines.find(line => line.includes('拆分记忆法'));
                     const scenarioMethod = memoryLines.find(line => line.includes('场景记忆法'));
+                    const homophonicMethod = memoryLines.find(line => line.includes('谐音记忆法'));
+                    
                     const splitContent = memoryLines.filter((line, i) => {
                       const prevLine = memoryLines[i - 1];
-                      return prevLine && prevLine.includes('拆分记忆法') && !line.includes('场景记忆法');
+                      return prevLine && prevLine.includes('拆分记忆法') && !line.includes('场景记忆法') && !line.includes('谐音记忆法');
                     });
                     const scenarioContent = memoryLines.filter((line, i) => {
                       const prevLine = memoryLines[i - 1];
-                      return prevLine && prevLine.includes('场景记忆法');
+                      return prevLine && prevLine.includes('场景记忆法') && !line.includes('谐音记忆法');
+                    });
+                    const homophonicContent = memoryLines.filter((line, i) => {
+                      const prevLine = memoryLines[i - 1];
+                      return prevLine && prevLine.includes('谐音记忆法');
                     });
 
                     sections.push(
                       <div key={`memory-${index}`} style={{ 
-                        marginBottom: 20, 
-                        padding: '20px', 
-                        background: '#f8f9fa', 
-                        borderRadius: 8,
-                        border: '1px solid #e9ecef'
+                        marginBottom: 24, 
+                        padding: '24px', 
+                        background: '#ffffff', 
+                        borderRadius: 12,
+                        border: '2px solid #e3f2fd',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
                       }}>
-                        <div style={{ marginBottom: 16 }}>
-                          <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#495057', marginBottom: 12, display: 'block' }}>
-                            联想记忆
+                        <div style={{ 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          marginBottom: 20,
+                          paddingBottom: 12,
+                          borderBottom: '2px solid #e3f2fd'
+                        }}>
+                          <div style={{
+                            background: '#2196f3',
+                            color: 'white',
+                            borderRadius: '50%',
+                            width: '32px',
+                            height: '32px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            marginRight: 12,
+                            fontSize: '16px',
+                            fontWeight: 'bold'
+                          }}>
+                            🧠
+                          </div>
+                          <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#1976d2' }}>
+                            联想记忆技巧
                           </Text>
-                          
+                        </div>
+                        
+                        <div style={{ display: 'grid', gap: '20px' }}>
                           {splitMethod && splitContent.length > 0 && (
-                            <div style={{ marginBottom: 16 }}>
-                              <Text style={{ fontSize: 14, fontWeight: '600', color: '#6c757d', marginBottom: 8, display: 'block' }}>
-                                拆分记忆法：
-                              </Text>
-                              <div style={{ paddingLeft: 16 }}>
+                            <div style={{ 
+                              padding: '16px', 
+                              background: '#f8f9fa', 
+                              borderRadius: '8px',
+                              border: '1px solid #e9ecef'
+                            }}>
+                              <div style={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                marginBottom: 12 
+                              }}>
+                                <span style={{
+                                  background: '#4caf50',
+                                  color: 'white',
+                                  padding: '4px 8px',
+                                  borderRadius: '4px',
+                                  fontSize: '12px',
+                                  fontWeight: 'bold',
+                                  marginRight: '8px'
+                                }}>
+                                  方法1
+                                </span>
+                                <Text style={{ fontSize: 15, fontWeight: '600', color: '#2e7d32' }}>
+                                  拆分记忆法
+                                </Text>
+                              </div>
+                              <div style={{ paddingLeft: 8 }}>
                                 {splitContent.map((item, idx) => (
-                                  <div key={idx} style={{ marginBottom: 6, fontSize: 14, lineHeight: 1.5, color: '#495057' }}>
-                                    • {item.replace(/^[-•]\s*/, '').trim()}
+                                  <div key={idx} style={{ 
+                                    marginBottom: 8, 
+                                    padding: '8px 12px',
+                                    background: '#ffffff',
+                                    borderRadius: '6px',
+                                    fontSize: 14, 
+                                    lineHeight: 1.6, 
+                                    color: '#495057',
+                                    border: '1px solid #e0e0e0'
+                                  }}>
+                                    <span style={{ color: '#4caf50', fontWeight: 'bold' }}>•</span> {item.replace(/^[-•]\s*/, '').trim()}
                                   </div>
                                 ))}
                               </div>
@@ -808,14 +869,91 @@ const Vocabulary: React.FC = () => {
                           )}
                           
                           {scenarioMethod && scenarioContent.length > 0 && (
-                            <div>
-                              <Text style={{ fontSize: 14, fontWeight: '600', color: '#6c757d', marginBottom: 8, display: 'block' }}>
-                                场景记忆法：
-                              </Text>
-                              <div style={{ paddingLeft: 16 }}>
+                            <div style={{ 
+                              padding: '16px', 
+                              background: '#fff3e0', 
+                              borderRadius: '8px',
+                              border: '1px solid #ffcc02'
+                            }}>
+                              <div style={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                marginBottom: 12 
+                              }}>
+                                <span style={{
+                                  background: '#ff9800',
+                                  color: 'white',
+                                  padding: '4px 8px',
+                                  borderRadius: '4px',
+                                  fontSize: '12px',
+                                  fontWeight: 'bold',
+                                  marginRight: '8px'
+                                }}>
+                                  方法2
+                                </span>
+                                <Text style={{ fontSize: 15, fontWeight: '600', color: '#f57c00' }}>
+                                  场景记忆法
+                                </Text>
+                              </div>
+                              <div style={{ paddingLeft: 8 }}>
                                 {scenarioContent.map((item, idx) => (
-                                  <div key={idx} style={{ marginBottom: 6, fontSize: 14, lineHeight: 1.5, color: '#495057' }}>
-                                    • {item.replace(/^[-•]\s*/, '').trim()}
+                                  <div key={idx} style={{ 
+                                    marginBottom: 8, 
+                                    padding: '8px 12px',
+                                    background: '#ffffff',
+                                    borderRadius: '6px',
+                                    fontSize: 14, 
+                                    lineHeight: 1.6, 
+                                    color: '#495057',
+                                    border: '1px solid #ffcc02'
+                                  }}>
+                                    <span style={{ color: '#ff9800', fontWeight: 'bold' }}>•</span> {item.replace(/^[-•]\s*/, '').trim()}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {homophonicMethod && homophonicContent.length > 0 && (
+                            <div style={{ 
+                              padding: '16px', 
+                              background: '#f3e5f5', 
+                              borderRadius: '8px',
+                              border: '1px solid #ba68c8'
+                            }}>
+                              <div style={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                marginBottom: 12 
+                              }}>
+                                <span style={{
+                                  background: '#9c27b0',
+                                  color: 'white',
+                                  padding: '4px 8px',
+                                  borderRadius: '4px',
+                                  fontSize: '12px',
+                                  fontWeight: 'bold',
+                                  marginRight: '8px'
+                                }}>
+                                  方法3
+                                </span>
+                                <Text style={{ fontSize: 15, fontWeight: '600', color: '#7b1fa2' }}>
+                                  谐音记忆法
+                                </Text>
+                              </div>
+                              <div style={{ paddingLeft: 8 }}>
+                                {homophonicContent.map((item, idx) => (
+                                  <div key={idx} style={{ 
+                                    marginBottom: 8, 
+                                    padding: '8px 12px',
+                                    background: '#ffffff',
+                                    borderRadius: '6px',
+                                    fontSize: 14, 
+                                    lineHeight: 1.6, 
+                                    color: '#495057',
+                                    border: '1px solid #ba68c8'
+                                  }}>
+                                    <span style={{ color: '#9c27b0', fontWeight: 'bold' }}>•</span> {item.replace(/^[-•]\s*/, '').trim()}
                                   </div>
                                 ))}
                               </div>
@@ -856,31 +994,79 @@ const Vocabulary: React.FC = () => {
 
                     sections.push(
                       <div key={`related-${index}`} style={{ 
-                        marginBottom: 20, 
-                        padding: '20px', 
-                        background: '#f8f9fa', 
-                        borderRadius: 8,
-                        border: '1px solid #e9ecef'
+                        marginBottom: 24, 
+                        padding: '24px', 
+                        background: '#ffffff', 
+                        borderRadius: 12,
+                        border: '2px solid #fff3e0',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
                       }}>
-                        <div style={{ marginBottom: 16 }}>
-                          <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#495057', marginBottom: 12, display: 'block' }}>
-                            相关词汇
+                        <div style={{ 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          marginBottom: 20,
+                          paddingBottom: 12,
+                          borderBottom: '2px solid #fff3e0'
+                        }}>
+                          <div style={{
+                            background: '#ff9800',
+                            color: 'white',
+                            borderRadius: '50%',
+                            width: '32px',
+                            height: '32px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            marginRight: 12,
+                            fontSize: '16px',
+                            fontWeight: 'bold'
+                          }}>
+                            🔗
+                          </div>
+                          <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#f57c00' }}>
+                            词汇网络
                           </Text>
-                          
+                        </div>
+                        
+                        <div style={{ display: 'grid', gap: '16px' }}>
                           {synonymWords.length > 0 && (
-                            <div style={{ marginBottom: 12 }}>
-                              <Text style={{ fontSize: 14, fontWeight: '600', color: '#6c757d', marginBottom: 6, display: 'block' }}>
-                                近义词：
-                              </Text>
-                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                            <div style={{ 
+                              padding: '16px', 
+                              background: '#e8f5e8', 
+                              borderRadius: '8px',
+                              border: '1px solid #4caf50'
+                            }}>
+                              <div style={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                marginBottom: 12 
+                              }}>
+                                <span style={{
+                                  background: '#4caf50',
+                                  color: 'white',
+                                  padding: '4px 8px',
+                                  borderRadius: '4px',
+                                  fontSize: '12px',
+                                  fontWeight: 'bold',
+                                  marginRight: '8px'
+                                }}>
+                                  同义
+                                </span>
+                                <Text style={{ fontSize: 15, fontWeight: '600', color: '#2e7d32' }}>
+                                  近义词 ({synonymWords.length}个)
+                                </Text>
+                              </div>
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                                 {synonymWords.map((word, idx) => (
                                   <span key={idx} style={{ 
-                                    background: '#e3f2fd', 
-                                    color: '#1976d2', 
-                                    padding: '2px 8px', 
-                                    borderRadius: '4px', 
+                                    background: '#ffffff', 
+                                    color: '#2e7d32', 
+                                    padding: '6px 12px', 
+                                    borderRadius: '20px', 
                                     fontSize: '13px',
-                                    border: '1px solid #bbdefb'
+                                    fontWeight: '500',
+                                    border: '1px solid #4caf50',
+                                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
                                   }}>
                                     {word}
                                   </span>
@@ -890,19 +1076,43 @@ const Vocabulary: React.FC = () => {
                           )}
                           
                           {antonymWords.length > 0 && (
-                            <div style={{ marginBottom: 12 }}>
-                              <Text style={{ fontSize: 14, fontWeight: '600', color: '#6c757d', marginBottom: 6, display: 'block' }}>
-                                反义词：
-                              </Text>
-                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                            <div style={{ 
+                              padding: '16px', 
+                              background: '#ffebee', 
+                              borderRadius: '8px',
+                              border: '1px solid #f44336'
+                            }}>
+                              <div style={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                marginBottom: 12 
+                              }}>
+                                <span style={{
+                                  background: '#f44336',
+                                  color: 'white',
+                                  padding: '4px 8px',
+                                  borderRadius: '4px',
+                                  fontSize: '12px',
+                                  fontWeight: 'bold',
+                                  marginRight: '8px'
+                                }}>
+                                  反义
+                                </span>
+                                <Text style={{ fontSize: 15, fontWeight: '600', color: '#c62828' }}>
+                                  反义词 ({antonymWords.length}个)
+                                </Text>
+                              </div>
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                                 {antonymWords.map((word, idx) => (
                                   <span key={idx} style={{ 
-                                    background: '#ffebee', 
-                                    color: '#d32f2f', 
-                                    padding: '2px 8px', 
-                                    borderRadius: '4px', 
+                                    background: '#ffffff', 
+                                    color: '#c62828', 
+                                    padding: '6px 12px', 
+                                    borderRadius: '20px', 
                                     fontSize: '13px',
-                                    border: '1px solid #ffcdd2'
+                                    fontWeight: '500',
+                                    border: '1px solid #f44336',
+                                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
                                   }}>
                                     {word}
                                   </span>
@@ -912,19 +1122,43 @@ const Vocabulary: React.FC = () => {
                           )}
                           
                           {derivativeWords.length > 0 && (
-                            <div style={{ marginBottom: 12 }}>
-                              <Text style={{ fontSize: 14, fontWeight: '600', color: '#6c757d', marginBottom: 6, display: 'block' }}>
-                                派生词：
-                              </Text>
-                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                            <div style={{ 
+                              padding: '16px', 
+                              background: '#f3e5f5', 
+                              borderRadius: '8px',
+                              border: '1px solid #9c27b0'
+                            }}>
+                              <div style={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                marginBottom: 12 
+                              }}>
+                                <span style={{
+                                  background: '#9c27b0',
+                                  color: 'white',
+                                  padding: '4px 8px',
+                                  borderRadius: '4px',
+                                  fontSize: '12px',
+                                  fontWeight: 'bold',
+                                  marginRight: '8px'
+                                }}>
+                                  派生
+                                </span>
+                                <Text style={{ fontSize: 15, fontWeight: '600', color: '#7b1fa2' }}>
+                                  派生词 ({derivativeWords.length}个)
+                                </Text>
+                              </div>
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                                 {derivativeWords.map((word, idx) => (
                                   <span key={idx} style={{ 
-                                    background: '#f3e5f5', 
+                                    background: '#ffffff', 
                                     color: '#7b1fa2', 
-                                    padding: '2px 8px', 
-                                    borderRadius: '4px', 
+                                    padding: '6px 12px', 
+                                    borderRadius: '20px', 
                                     fontSize: '13px',
-                                    border: '1px solid #e1bee7'
+                                    fontWeight: '500',
+                                    border: '1px solid #9c27b0',
+                                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
                                   }}>
                                     {word}
                                   </span>
@@ -934,14 +1168,46 @@ const Vocabulary: React.FC = () => {
                           )}
                           
                           {phraseContent.length > 0 && (
-                            <div>
-                              <Text style={{ fontSize: 14, fontWeight: '600', color: '#6c757d', marginBottom: 6, display: 'block' }}>
-                                相关短语：
-                              </Text>
-                              <div style={{ paddingLeft: 16 }}>
+                            <div style={{ 
+                              padding: '16px', 
+                              background: '#e3f2fd', 
+                              borderRadius: '8px',
+                              border: '1px solid #2196f3'
+                            }}>
+                              <div style={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                marginBottom: 12 
+                              }}>
+                                <span style={{
+                                  background: '#2196f3',
+                                  color: 'white',
+                                  padding: '4px 8px',
+                                  borderRadius: '4px',
+                                  fontSize: '12px',
+                                  fontWeight: 'bold',
+                                  marginRight: '8px'
+                                }}>
+                                  短语
+                                </span>
+                                <Text style={{ fontSize: 15, fontWeight: '600', color: '#1976d2' }}>
+                                  相关短语 ({phraseContent.length}个)
+                                </Text>
+                              </div>
+                              <div style={{ paddingLeft: 8 }}>
                                 {phraseContent.map((item, idx) => (
-                                  <div key={idx} style={{ marginBottom: 4, fontSize: 14, lineHeight: 1.5, color: '#495057' }}>
-                                    • {item.replace(/^[-•]\s*/, '').trim()}
+                                  <div key={idx} style={{ 
+                                    marginBottom: 8, 
+                                    padding: '8px 12px',
+                                    background: '#ffffff',
+                                    borderRadius: '6px',
+                                    fontSize: 14, 
+                                    lineHeight: 1.6, 
+                                    color: '#1976d2',
+                                    border: '1px solid #bbdefb',
+                                    fontWeight: '500'
+                                  }}>
+                                    <span style={{ color: '#2196f3', fontWeight: 'bold' }}>•</span> {item.replace(/^[-•]\s*/, '').trim()}
                                   </div>
                                 ))}
                               </div>
