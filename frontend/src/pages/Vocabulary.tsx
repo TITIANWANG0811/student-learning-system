@@ -736,19 +736,21 @@ const Vocabulary: React.FC = () => {
                     sections.push(
                       <div key={`example-${index}`} style={{ 
                         marginBottom: 16, 
-                        padding: '16px', 
-                        background: '#f0f9ff', 
-                        borderRadius: 8,
-                        border: '1px solid #91d5ff'
+                        padding: '18px', 
+                        background: 'linear-gradient(135deg, #f0f9ff 0%, #bae7ff 100%)', 
+                        borderRadius: 10,
+                        border: '2px solid #69c0ff',
+                        boxShadow: '0 2px 8px rgba(24, 144, 255, 0.1)'
                       }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                          <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#1890ff' }}>例句</Text>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                          <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#1890ff' }}>💬 例句</Text>
                         </div>
                         <Text style={{ 
                           fontSize: 16, 
                           fontStyle: 'italic', 
                           lineHeight: 1.6, 
                           color: '#003a8c',
+                          fontWeight: '500',
                           display: 'block'
                         }}>
                           {example}
@@ -771,19 +773,21 @@ const Vocabulary: React.FC = () => {
                     
                     sections.push(
                       <div key={`memory-${index}`} style={{ 
-                        marginBottom: 16, 
-                        padding: '16px', 
-                        background: '#f6ffed', 
-                        borderRadius: 8,
-                        border: '1px solid #b7eb8f'
+                        marginBottom: 20, 
+                        padding: '20px', 
+                        background: 'linear-gradient(135deg, #f6ffed 0%, #d9f7be 100%)', 
+                        borderRadius: 12,
+                        border: '2px solid #95de64',
+                        boxShadow: '0 4px 12px rgba(82, 196, 26, 0.15)'
                       }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                          <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#389e0d' }}>联想记忆</Text>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                          <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#389e0d' }}>🧠 联想记忆</Text>
                         </div>
                         <Text style={{ 
-                          fontSize: 15, 
+                          fontSize: 16, 
                           lineHeight: 1.6, 
-                          color: '#389e0d',
+                          color: '#237804',
+                          fontWeight: '500',
                           display: 'block'
                         }}>
                           {memory}
@@ -807,19 +811,21 @@ const Vocabulary: React.FC = () => {
                     
                     sections.push(
                       <div key={`related-${index}`} style={{ 
-                        marginBottom: 16, 
-                        padding: '16px', 
-                        background: '#fff2e8', 
-                        borderRadius: 8,
-                        border: '1px solid #ffbb96'
+                        marginBottom: 20, 
+                        padding: '20px', 
+                        background: 'linear-gradient(135deg, #fff2e8 0%, #ffd8bf 100%)', 
+                        borderRadius: 12,
+                        border: '2px solid #ff9c6e',
+                        boxShadow: '0 4px 12px rgba(250, 140, 22, 0.15)'
                       }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                          <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#d4380d' }}>相关词汇</Text>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                          <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#d4380d' }}>🔗 相关词汇</Text>
                         </div>
                         <Text style={{ 
-                          fontSize: 15, 
+                          fontSize: 16, 
                           lineHeight: 1.6, 
-                          color: '#d4380d',
+                          color: '#ad2102',
+                          fontWeight: '500',
                           display: 'block'
                         }}>
                           {related}
