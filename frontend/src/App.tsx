@@ -20,6 +20,7 @@ import SubjectCategories from './pages/SubjectCategories';
 import StudyContent from './pages/StudyContent';
 import SubjectPage from './pages/SubjectPage';
 import ScrollTest from './pages/ScrollTest';
+import Vocabulary from './pages/Vocabulary';
 import Settings from './pages/Settings';
 
 import { AuthProvider } from './contexts/AuthContext';
@@ -130,6 +131,7 @@ const App: React.FC = () => {
               <Route path="wrong-questions/history/:grade" element={<SubjectPage contentType="wrong-questions" />} />
                      <Route path="wrong-questions/ethics" element={<SubjectPage contentType="wrong-questions" />} />
                      <Route path="wrong-questions/ethics/:grade" element={<SubjectPage contentType="wrong-questions" />} />
+                     <Route path="vocabulary" element={<Vocabulary />} />
                      <Route path="scroll-test" element={<ScrollTest />} />
                      <Route path="settings" element={<Settings />} />
             </Route>

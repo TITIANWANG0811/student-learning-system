@@ -178,6 +178,11 @@ const Layout: React.FC = () => {
       label: '帮助中心',
     },
     {
+      key: '/vocabulary',
+      icon: <BookOutlined />,
+      label: '词汇管理',
+    },
+    {
       key: '/scroll-test',
       icon: <BarChartOutlined />,
       label: '滚动测试',
