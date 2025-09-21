@@ -791,11 +791,15 @@ const Vocabulary: React.FC = () => {
                   }
                   
                   // 联想记忆
-                  else if (trimmedLine.includes('**联想记忆**:') || trimmedLine.includes('**记忆**:')) {
+                  else if (trimmedLine.includes('**联想记忆**:') || trimmedLine.includes('**记忆**:') || trimmedLine.includes('联想记忆') || trimmedLine.includes('记忆') || trimmedLine.includes('[!tip] 联想记忆')) {
                     const memory = trimmedLine
                       .replace(/^>\s*-\s*\*\*联想记忆\*\*:\s*/, '')
                       .replace(/\*\*联想记忆\*\*:\s*/, '')
                       .replace(/\*\*记忆\*\*:\s*/, '')
+                      .replace(/联想记忆:\s*/, '')
+                      .replace(/记忆:\s*/, '')
+                      .replace(/^>\s*\[!tip\]\s*联想记忆\s*/, '')
+                      .replace(/\[!tip\]\s*联想记忆\s*/, '')
                       .replace(/>/g, '')
                       .replace(/\*/g, '')
                       .replace(/^[-•]\s*/, '') // 移除列表符号
