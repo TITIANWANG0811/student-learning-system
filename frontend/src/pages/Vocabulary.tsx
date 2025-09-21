@@ -4,7 +4,6 @@ import {
   Button,
   Table,
   Tag,
-  Space,
   Typography,
   Row,
   Col,
@@ -12,23 +11,19 @@ import {
   message,
   Input,
   Select,
-  Popconfirm
+  Modal
 } from 'antd';
 import {
   BookOutlined,
   TrophyOutlined,
   ClockCircleOutlined,
   CheckCircleOutlined,
-  ImportOutlined,
-  DeleteOutlined,
   BarChartOutlined,
   StarOutlined
 } from '@ant-design/icons';
 import { useResponsive } from '../hooks/useResponsive';
 import { 
   getGrade1EnglishVocabulary, 
-  importGrade1EnglishVocabulary, 
-  clearGrade1EnglishVocabulary, 
   getVocabularyStats,
   updateVocabularyMemorized,
   VocabularyItem,
@@ -47,9 +42,12 @@ const Vocabulary: React.FC = () => {
   const [stats, setStats] = useState<VocabularyStats | null>(null);
   const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState('');
-  const [difficultyFilter, setDifficultyFilter] = useState<number | undefined>();
   const [memorizedFilter, setMemorizedFilter] = useState<boolean | undefined>();
+  const [vocabularyTypeFilter, setVocabularyTypeFilter] = useState<string | undefined>();
+  const [unitFilter, setUnitFilter] = useState<string | undefined>();
   const [selectedGrade, setSelectedGrade] = useState<string>('初一');
+  const [selectedWord, setSelectedWord] = useState<VocabularyItem | null>(null);
+  const [wordDetailVisible, setWordDetailVisible] = useState(false);
   const { isMobile, isTablet } = useResponsive();
   const { user } = useAuth();
 
@@ -64,7 +62,7 @@ const Vocabulary: React.FC = () => {
   useEffect(() => {
     // 测试模式：直接重新加载数据
     loadVocabulary();
-  }, [difficultyFilter, memorizedFilter, selectedGrade]);
+  }, [memorizedFilter, vocabularyTypeFilter, unitFilter, selectedGrade]);
 
   const loadVocabulary = async () => {
     setLoading(true);
@@ -74,7 +72,6 @@ const Vocabulary: React.FC = () => {
       // 根据选择的年级加载不同的数据
       if (selectedGrade === '初一') {
         response = await getGrade1EnglishVocabulary({
-          difficulty_level: difficultyFilter,
           is_memorized: memorizedFilter
         });
       } else if (selectedGrade === '初二') {
@@ -108,31 +105,6 @@ const Vocabulary: React.FC = () => {
     }
   };
 
-  const handleImport = async () => {
-    try {
-      // 测试模式：使用固定的学生ID
-      const response = await importGrade1EnglishVocabulary('test-user');
-      message.success(`成功导入 ${response.imported_count} 个初一英语单词！`);
-      loadVocabulary();
-      loadStats();
-    } catch (error) {
-      console.error('导入失败:', error);
-      message.error('导入失败');
-    }
-  };
-
-  const handleClear = async () => {
-    try {
-      // 测试模式：使用固定的学生ID
-      const response = await clearGrade1EnglishVocabulary('test-user');
-      message.success(`成功清空 ${response.deleted_count} 个单词！`);
-      loadVocabulary();
-      loadStats();
-    } catch (error) {
-      console.error('清空失败:', error);
-      message.error('清空失败');
-    }
-  };
 
   const handleMemorize = async (id: string, memorized: boolean) => {
     try {
@@ -151,13 +123,39 @@ const Vocabulary: React.FC = () => {
     }
   };
 
+  const handleWordClick = (word: VocabularyItem) => {
+    setSelectedWord(word);
+    setWordDetailVisible(true);
+  };
+
+  const closeWordDetail = () => {
+    setWordDetailVisible(false);
+    setSelectedWord(null);
+  };
+
   const filteredVocabulary = vocabulary.filter(item => {
     const matchesSearch = item.title.toLowerCase().includes(searchText.toLowerCase()) ||
                           item.content.toLowerCase().includes(searchText.toLowerCase());
-    const matchesDifficulty = !difficultyFilter || item.difficulty_level === difficultyFilter;
     const matchesMemorized = memorizedFilter === undefined || item.is_memorized === memorizedFilter;
     
-    return matchesSearch && matchesDifficulty && matchesMemorized;
+    // 支持地名、人名和其他筛选
+    let matchesVocabularyType = true;
+    if (vocabularyTypeFilter) {
+      if (vocabularyTypeFilter === 'proper_place') {
+        matchesVocabularyType = item.vocabulary_type === 'proper_place';
+      } else if (vocabularyTypeFilter === 'proper_name') {
+        matchesVocabularyType = item.vocabulary_type === 'proper_name';
+      } else if (vocabularyTypeFilter === 'proper_other') {
+        // 其他：只包含proper_other类型
+        matchesVocabularyType = item.vocabulary_type === 'proper_other';
+      } else {
+        matchesVocabularyType = item.vocabulary_type === vocabularyTypeFilter;
+      }
+    }
+    
+    const matchesUnit = !unitFilter || item.unit_name === unitFilter;
+    
+    return matchesSearch && matchesMemorized && matchesVocabularyType && matchesUnit;
   });
 
   const columns = [
@@ -165,12 +163,129 @@ const Vocabulary: React.FC = () => {
       title: '单词',
       dataIndex: 'title',
       key: 'title',
-      width: 120,
-      render: (text: string) => (
-        <Text strong style={{ fontSize: 16, color: '#1890ff' }}>
+      width: 150,
+      render: (text: string, record: VocabularyItem) => (
+        <Button
+          type="link"
+          style={{ 
+            padding: 0, 
+            height: 'auto', 
+            fontSize: 16,
+            fontWeight: 'bold',
+            color: '#1890ff',
+            whiteSpace: 'normal', // 允许换行
+            wordBreak: 'break-word', // 单词内换行
+            textAlign: 'left', // 左对齐
+            lineHeight: '1.4' // 行高
+          }}
+          onClick={() => handleWordClick(record)}
+        >
           {text}
-        </Text>
+        </Button>
       ),
+    },
+    {
+      title: '类型',
+      dataIndex: 'vocabulary_type',
+      key: 'vocabulary_type',
+      width: 100,
+      align: 'center' as const,
+             render: (type: string) => {
+               const typeConfig = {
+                 'word': { color: 'blue', text: '单词' },
+                 'phrase': { color: 'green', text: '短语' },
+                 'idiom': { color: 'orange', text: '习语' },
+                 'proper_name': { color: 'purple', text: '人名' },
+                 'proper_place': { color: 'cyan', text: '地名' },
+                 'proper_other': { color: 'magenta', text: '其他' }
+               };
+               const config = typeConfig[type as keyof typeof typeConfig] || { color: 'default', text: '未知' };
+               return <Tag color={config.color}>{config.text}</Tag>;
+             },
+    },
+    {
+      title: '音标',
+      dataIndex: 'content',
+      key: 'phonetic',
+      width: 150,
+      align: 'center' as const,
+      render: (content: string) => {
+        const lines = content.split('\n');
+        const phoneticLine = lines.find(line => line.includes('**音标**:'));
+        if (phoneticLine) {
+          // 更精确的解析，处理各种Markdown格式
+          let phonetic = phoneticLine
+            .replace(/^>\s*-\s*\*\*音标\*\*:\s*/, '') // 处理 > - **音标**: 格式
+            .replace(/\*\*音标\*\*:\s*/, '') // 处理 **音标**: 格式
+            .replace(/>/g, '') // 移除所有 >
+            .replace(/\*/g, '') // 移除所有 *
+            .trim();
+          
+          return (
+            <Text 
+              code 
+              style={{ 
+                fontSize: 12, 
+                color: '#1890ff',
+                fontFamily: 'Monaco, Consolas, "Courier New", monospace',
+                background: '#f0f8ff',
+                padding: '2px 6px',
+                borderRadius: '4px',
+                border: '1px solid #d6e4ff'
+              }}
+            >
+              {phonetic}
+            </Text>
+          );
+        }
+        return <Text type="secondary">-</Text>;
+      },
+    },
+    {
+      title: '词性',
+      dataIndex: 'content',
+      key: 'pos',
+      width: 100,
+      align: 'center' as const,
+      render: (content: string) => {
+        const lines = content.split('\n');
+        const posLine = lines.find(line => line.includes('**词性**:'));
+        if (posLine) {
+          // 更精确的解析，处理各种Markdown格式
+          let pos = posLine
+            .replace(/^>\s*-\s*\*\*词性\*\*:\s*/, '') // 处理 > - **词性**: 格式
+            .replace(/\*\*词性\*\*:\s*/, '') // 处理 **词性**: 格式
+            .replace(/>/g, '') // 移除所有 >
+            .replace(/\*/g, '') // 移除所有 *
+            .trim();
+          
+          // 根据词性类型选择不同颜色
+          const getPosColor = (posText: string) => {
+            if (posText.includes('n.') || posText.includes('名词')) return 'blue';
+            if (posText.includes('v.') || posText.includes('动词')) return 'green';
+            if (posText.includes('adj.') || posText.includes('形容词')) return 'orange';
+            if (posText.includes('adv.') || posText.includes('副词')) return 'purple';
+            if (posText.includes('prep.') || posText.includes('介词')) return 'cyan';
+            if (posText.includes('pron.') || posText.includes('代词')) return 'magenta';
+            return 'blue';
+          };
+          
+          return (
+            <Tag 
+              color={getPosColor(pos)} 
+              style={{ 
+                fontSize: 11,
+                fontWeight: 'bold',
+                borderRadius: '12px',
+                padding: '2px 8px'
+              }}
+            >
+              {pos}
+            </Tag>
+          );
+        }
+        return <Text type="secondary">-</Text>;
+      },
     },
     {
       title: '释义',
@@ -179,70 +294,34 @@ const Vocabulary: React.FC = () => {
       ellipsis: true,
       render: (content: string) => {
         const lines = content.split('\n');
-        const definition = lines.find(line => line.includes('中文释义:')) || lines[2] || '';
-        return (
-          <Text ellipsis={{ tooltip: definition }}>
-            {definition.replace('中文释义:', '').trim()}
-          </Text>
-        );
+        const definition = lines.find(line => line.includes('**中文释义**:'));
+        if (definition) {
+          // 更精确的解析，处理各种Markdown格式
+          let meaning = definition
+            .replace(/^>\s*-\s*\*\*中文释义\*\*:\s*/, '') // 处理 > - **中文释义**: 格式
+            .replace(/\*\*中文释义\*\*:\s*/, '') // 处理 **中文释义**: 格式
+            .replace(/>/g, '') // 移除所有 >
+            .replace(/\*/g, '') // 移除所有 *
+            .trim();
+          
+          return (
+            <Text 
+              ellipsis={{ tooltip: meaning }}
+              style={{
+                fontSize: 13,
+                lineHeight: '1.4',
+                color: '#262626'
+              }}
+            >
+              {meaning}
+            </Text>
+          );
+        }
+        return <Text type="secondary">-</Text>;
       },
-    },
-    {
-      title: '难度',
-      dataIndex: 'difficulty_level',
-      key: 'difficulty_level',
-      width: 80,
-      align: 'center' as const,
-      render: (level: number) => (
-        <Tag color="gold">{level} 星</Tag>
-      ),
-    },
-    {
-      title: '状态',
-      dataIndex: 'is_memorized',
-      key: 'is_memorized',
-      width: 100,
-      align: 'center' as const,
-      render: (memorized: boolean) => (
-        <Tag color={memorized ? 'green' : 'blue'}>
-          {memorized ? '已背诵' : '未背诵'}
-        </Tag>
-      ),
-    },
-    {
-      title: '练习',
-      dataIndex: 'practice_count',
-      key: 'practice_count',
-      width: 80,
-      align: 'center' as const,
-      render: (count: number) => (
-        <Text type="secondary">{count} 次</Text>
-      ),
-    },
-    {
-      title: '操作',
-      key: 'actions',
-      width: 120,
-      align: 'center' as const,
-      render: (record: VocabularyItem) => (
-        <Button
-          type={record.is_memorized ? 'default' : 'primary'}
-          size="small"
-          onClick={() => handleMemorize(record.id, !record.is_memorized)}
-        >
-          {record.is_memorized ? '取消背诵' : '标记背诵'}
-        </Button>
-      ),
     },
   ];
 
-  const difficultyOptions = [
-    { value: 1, label: '1级 (简单)', color: 'green' },
-    { value: 2, label: '2级 (较易)', color: 'blue' },
-    { value: 3, label: '3级 (中等)', color: 'orange' },
-    { value: 4, label: '4级 (较难)', color: 'red' },
-    { value: 5, label: '5级 (困难)', color: 'purple' },
-  ];
 
   return (
     <div style={{ padding: isMobile ? '12px' : '24px' }}>
@@ -251,7 +330,7 @@ const Vocabulary: React.FC = () => {
                  <BookOutlined style={{ marginRight: 8 }} />
                  词汇管理
                </Title>
-               <Space size="middle">
+               <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
                  <Button
                    type={selectedGrade === '初一' ? 'primary' : 'default'}
                    size="large"
@@ -276,7 +355,7 @@ const Vocabulary: React.FC = () => {
                  >
                    初三
                  </Button>
-               </Space>
+               </div>
              </div>
 
       {/* 统计卡片 - 只在有数据时显示 */}
@@ -329,31 +408,7 @@ const Vocabulary: React.FC = () => {
              {/* 操作栏 */}
              <Card style={{ marginBottom: 16 }}>
                <Row gutter={[16, 16]} align="middle">
-                 <Col xs={24} sm={12} md={8}>
-                   <Space>
-                     <Button
-                       type="primary"
-                       icon={<ImportOutlined />}
-                       onClick={handleImport}
-                     >
-                       导入单词表
-                     </Button>
-                     <Popconfirm
-                       title="确定要清空所有单词吗？"
-                       onConfirm={handleClear}
-                       okText="确定"
-                       cancelText="取消"
-                     >
-                       <Button
-                         danger
-                         icon={<DeleteOutlined />}
-                       >
-                         清空单词表
-                       </Button>
-                     </Popconfirm>
-                   </Space>
-                 </Col>
-                 <Col xs={24} sm={12} md={8}>
+                 <Col xs={24} sm={12} md={6}>
                    <Search
                      placeholder="搜索单词或释义"
                      value={searchText}
@@ -361,32 +416,51 @@ const Vocabulary: React.FC = () => {
                      style={{ width: '100%' }}
                    />
                  </Col>
-                 <Col xs={24} sm={12} md={8}>
-                   <Space wrap>
-                     <Select
-                       placeholder="难度筛选"
-                       value={difficultyFilter}
-                       onChange={setDifficultyFilter}
-                       style={{ minWidth: 120 }}
-                       allowClear
-                     >
-                       {difficultyOptions.map(option => (
-                         <Option key={option.value} value={option.value}>
-                           {option.label}
-                         </Option>
-                       ))}
-                     </Select>
-                     <Select
-                       placeholder="背诵状态"
-                       value={memorizedFilter}
-                       onChange={setMemorizedFilter}
-                       style={{ minWidth: 120 }}
-                       allowClear
-                     >
-                       <Option value={true}>已背诵</Option>
-                       <Option value={false}>未背诵</Option>
-                     </Select>
-                   </Space>
+                 <Col xs={24} sm={12} md={6}>
+                   <Select
+                     placeholder="单元筛选"
+                     value={unitFilter}
+                     onChange={setUnitFilter}
+                     style={{ width: '100%' }}
+                     allowClear
+                   >
+                     <Option value="Starter">Starter</Option>
+                     <Option value="Unit 1">Unit 1</Option>
+                     <Option value="Unit 2">Unit 2</Option>
+                     <Option value="Unit 3">Unit 3</Option>
+                     <Option value="Unit 4">Unit 4</Option>
+                     <Option value="Unit 5">Unit 5</Option>
+                     <Option value="Unit 6">Unit 6</Option>
+                     <Option value="Proper">专有名词</Option>
+                   </Select>
+                 </Col>
+                 <Col xs={24} sm={12} md={6}>
+                   <Select
+                     placeholder="背诵状态"
+                     value={memorizedFilter}
+                     onChange={setMemorizedFilter}
+                     style={{ width: '100%' }}
+                     allowClear
+                   >
+                     <Option value={true}>已背诵</Option>
+                     <Option value={false}>未背诵</Option>
+                   </Select>
+                 </Col>
+                 <Col xs={24} sm={12} md={6}>
+                   <Select
+                     placeholder="词汇类型"
+                     value={vocabularyTypeFilter}
+                     onChange={setVocabularyTypeFilter}
+                     style={{ width: '100%' }}
+                     allowClear
+                   >
+                     <Option value="word">单词</Option>
+                     <Option value="phrase">短语</Option>
+                     <Option value="idiom">习语</Option>
+                     <Option value="proper_name">人名</Option>
+                     <Option value="proper_place">地名</Option>
+                     <Option value="proper_other">其他</Option>
+                   </Select>
                  </Col>
                </Row>
              </Card>
@@ -394,14 +468,14 @@ const Vocabulary: React.FC = () => {
              {/* 词汇列表 */}
              <Card>
                <div style={{ marginBottom: 16, padding: '12px 0', borderBottom: '1px solid #f0f0f0' }}>
-                 <Space>
+                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                    <Text strong style={{ fontSize: 16 }}>
                      {selectedGrade}英语词汇
                    </Text>
                    <Text type="secondary">
                      共 {filteredVocabulary.length} 个单词
                    </Text>
-                 </Space>
+                 </div>
                </div>
                
                {filteredVocabulary.length === 0 && !loading ? (
@@ -415,7 +489,7 @@ const Vocabulary: React.FC = () => {
                      {selectedGrade === '初一' ? '暂无词汇数据' : `${selectedGrade}英语词汇数据暂未维护`}
                    </div>
                    <div style={{ fontSize: 14, color: '#bfbfbf' }}>
-                     {selectedGrade === '初一' ? '请尝试导入词汇数据' : '请选择其他年级或联系管理员添加数据'}
+                     {selectedGrade === '初一' ? '暂无词汇数据' : '请选择其他年级或联系管理员添加数据'}
                    </div>
                  </div>
                ) : (
@@ -434,6 +508,145 @@ const Vocabulary: React.FC = () => {
                  />
                )}
              </Card>
+
+      {/* 单词详情模态框 */}
+      <Modal
+        title={selectedWord ? `${selectedWord.title} - 单词详情` : ''}
+        open={wordDetailVisible}
+        onCancel={closeWordDetail}
+        footer={[
+          <Button key="close" onClick={closeWordDetail}>
+            关闭
+          </Button>,
+          selectedWord && (
+            <Button
+              key="memorize"
+              type={selectedWord.is_memorized ? 'default' : 'primary'}
+              icon={selectedWord.is_memorized ? <ClockCircleOutlined /> : <CheckCircleOutlined />}
+              onClick={() => {
+                handleMemorize(selectedWord.id, !selectedWord.is_memorized);
+                closeWordDetail();
+              }}
+            >
+              {selectedWord.is_memorized ? '取消背诵' : '标记背诵'}
+            </Button>
+          )
+        ]}
+        width={isMobile ? '95%' : isTablet ? '80%' : 600}
+        style={{ top: 20 }}
+      >
+        {selectedWord && (
+          <div style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+            {/* 单词基本信息 */}
+            <div style={{ marginBottom: 20, padding: '16px', background: '#f6f8fa', borderRadius: 8 }}>
+              <div style={{ marginBottom: 12 }}>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                  <Text strong style={{ fontSize: 24, color: '#1890ff' }}>
+                    {selectedWord.title}
+                  </Text>
+                  <Tag color={selectedWord.is_memorized ? 'green' : 'blue'}>
+                    {selectedWord.is_memorized ? '已背诵' : '未背诵'}
+                  </Tag>
+                </div>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Text type="secondary" style={{ fontSize: 14 }}>
+                  练习次数: {selectedWord.practice_count}
+                </Text>
+                <Text type="secondary" style={{ fontSize: 12 }}>
+                  创建: {new Date(selectedWord.created_at).toLocaleDateString()}
+                </Text>
+              </div>
+            </div>
+
+            {/* 单词详细内容 */}
+            <div style={{ marginBottom: 20 }}>
+              {selectedWord.content.split('\n').map((line, index) => {
+                const trimmedLine = line.trim();
+                
+                if (!trimmedLine) {
+                  return <div key={index} style={{ height: 8 }} />;
+                }
+                
+                // 音标
+                if (trimmedLine.includes('音标:') || (trimmedLine.includes('/') && !trimmedLine.includes('http'))) {
+                  return (
+                    <div key={index} style={{ marginBottom: 16, padding: '12px', background: '#e6f7ff', borderRadius: 6 }}>
+                      <Text type="secondary" style={{ fontSize: 18, fontWeight: 'bold', color: '#1890ff' }}>
+                        {trimmedLine}
+                      </Text>
+                    </div>
+                  );
+                }
+                
+                // 词性
+                if (trimmedLine.includes('词性:') || trimmedLine.includes('形容词') || trimmedLine.includes('名词') || trimmedLine.includes('动词') || trimmedLine.includes('副词')) {
+                  return (
+                    <div key={index} style={{ marginBottom: 14, padding: '8px 12px', background: '#f0f9ff', borderRadius: 4 }}>
+                      <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#0050b3' }}>
+                        {trimmedLine}
+                      </Text>
+                    </div>
+                  );
+                }
+                
+                // 中文释义
+                if (trimmedLine.includes('中文释义:') || trimmedLine.includes('释义:') || trimmedLine.includes('中文意思:')) {
+                  return (
+                    <div key={index} style={{ marginBottom: 18, padding: '16px', background: '#fff7e6', borderRadius: 8, border: '2px solid #ffd591' }}>
+                      <Text strong style={{ fontSize: 20, color: '#d46b08', lineHeight: 1.4 }}>
+                        {trimmedLine}
+                      </Text>
+                    </div>
+                  );
+                }
+                
+                // 例句
+                if (trimmedLine.includes('例句:') || /^\d+\./.test(trimmedLine) || /[A-Z][a-z].*\./.test(trimmedLine)) {
+                  return (
+                    <div key={index} style={{ marginBottom: 12, padding: '10px 12px', background: '#f0f9ff', borderRadius: 6 }}>
+                      <Text style={{ fontSize: 16, fontStyle: 'italic', lineHeight: 1.6, color: '#003a8c' }}>
+                        {trimmedLine}
+                      </Text>
+                    </div>
+                  );
+                }
+                
+                // 联想记忆
+                if (trimmedLine.includes('联想记忆:') || trimmedLine.includes('记忆:') || trimmedLine.includes('记忆方法:')) {
+                  return (
+                    <div key={index} style={{ marginBottom: 12, padding: '10px 12px', background: '#f6ffed', borderRadius: 6 }}>
+                      <Text type="secondary" style={{ fontSize: 15, lineHeight: 1.6, color: '#389e0d' }}>
+                        {trimmedLine}
+                      </Text>
+                    </div>
+                  );
+                }
+                
+                // 相关词汇
+                if (trimmedLine.includes('相关词汇:') || trimmedLine.includes('近义词') || trimmedLine.includes('反义词') || trimmedLine.includes('派生词')) {
+                  return (
+                    <div key={index} style={{ marginBottom: 12, padding: '10px 12px', background: '#fff2e8', borderRadius: 6 }}>
+                      <Text type="secondary" style={{ fontSize: 15, lineHeight: 1.6, color: '#d4380d' }}>
+                        {trimmedLine}
+                      </Text>
+                    </div>
+                  );
+                }
+                
+                // 其他信息
+                return (
+                  <div key={index} style={{ marginBottom: 10, padding: '8px 12px', background: '#fafafa', borderRadius: 4 }}>
+                    <Text style={{ fontSize: 15, lineHeight: 1.5, color: '#595959' }}>
+                      {trimmedLine}
+                    </Text>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </Modal>
 
     </div>
   );

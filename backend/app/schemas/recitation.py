@@ -15,7 +15,12 @@ class RecitationBase(BaseModel):
     """默写基础模式"""
     title: str = Field(..., description="默写标题")
     content: str = Field(..., description="默写内容")
+    markdown_content: Optional[str] = Field(None, description="Markdown格式的完整内容")
     recitation_type: str = Field(..., description="默写类型")
+    vocabulary_type: Optional[str] = Field(None, description="词汇类型")
+    proper_noun_type: Optional[str] = Field(None, description="专有名词类型")
+    grade_level: Optional[str] = Field(None, description="学籍等级")
+    unit_name: Optional[str] = Field(None, description="单元名称")
     difficulty_level: int = Field(1, ge=1, le=5, description="难度等级")
     is_memorized: bool = Field(False, description="是否已背诵")
 
@@ -30,7 +35,12 @@ class RecitationUpdate(BaseModel):
     """更新默写模式"""
     title: Optional[str] = Field(None, description="默写标题")
     content: Optional[str] = Field(None, description="默写内容")
+    markdown_content: Optional[str] = Field(None, description="Markdown格式的完整内容")
     recitation_type: Optional[str] = Field(None, description="默写类型")
+    vocabulary_type: Optional[str] = Field(None, description="词汇类型")
+    proper_noun_type: Optional[str] = Field(None, description="专有名词类型")
+    grade_level: Optional[str] = Field(None, description="学籍等级")
+    unit_name: Optional[str] = Field(None, description="单元名称")
     difficulty_level: Optional[int] = Field(None, ge=1, le=5, description="难度等级")
     is_memorized: Optional[bool] = Field(None, description="是否已背诵")
 

@@ -8,6 +8,9 @@ export interface VocabularyItem {
   title: string;
   content: string;
   recitation_type: string;
+  vocabulary_type?: string;
+  grade_level?: string;
+  unit_name?: string;
   difficulty_level: number;
   is_memorized: boolean;
   practice_count: number;

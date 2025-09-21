@@ -2,7 +2,8 @@
 数据模型模块
 """
 from .user import User
-from .subject import Subject, SubjectCategory, TextbookChapter, KnowledgePoint
+from .subject import Subject, TextbookChapter, KnowledgePoint
+from .subject_category import SubjectCategory
 from .study import StudyPlan, StudyTask
 from .content import Note, Assignment
 from .exam import Exam

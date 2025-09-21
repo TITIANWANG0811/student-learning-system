@@ -1,10 +1,15 @@
 """
 简化的测试API
+数据库规范：只使用 student_learning_system 数据库
+数据字段规范：只使用 markdown_content 字段存储词汇内容
 """
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import json
 import os
+from sqlalchemy.orm import Session
+from app.core.database import get_db
+from app.models.recitation import Recitation
 
 app = FastAPI(title="测试API")
 
@@ -17,78 +22,70 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+def get_vocabulary_type_display(vocab_type: str) -> str:
+    """获取词汇类型的中文显示名称"""
+    type_display = {
+        'word': '单词',
+        'phrase': '短语',
+        'idiom': '习语',
+        'proper_name': '人名',
+        'proper_place': '地名',
+        'proper_other': '专有名词'
+    }
+    return type_display.get(vocab_type, '单词')
+
 @app.get("/")
 def read_root():
     return {"message": "测试API运行中"}
 
 @app.get("/api/v1/vocabulary/grade1-english")
 def get_grade1_english_vocabulary():
-    """获取初一英语词汇"""
+    """获取初一英语词汇 - 从数据库读取Markdown内容"""
     try:
-        # 从JSON文件读取真实数据
-        json_file_path = "/Users/titianwang/Workspace/App/StudentLearningSystem/database/vocabulary/grade1_english_vocabulary.json"
+        # 获取数据库连接
+        db = next(get_db())
         
-        if os.path.exists(json_file_path):
-            with open(json_file_path, 'r', encoding='utf-8') as f:
-                vocabulary_data = json.load(f)
-            
-            # 转换为API格式
-            api_data = []
-            for i, item in enumerate(vocabulary_data, 1):
-                # 构建content字符串
-                content_parts = []
-                if item.get('phonetic'):
-                    content_parts.append(f"音标: {item['phonetic']}")
-                if item.get('part_of_speech'):
-                    content_parts.append(f"词性: {item['part_of_speech']}")
-                if item.get('meaning'):
-                    content_parts.append(f"中文释义: {item['meaning']}")
-                
-                # 添加例句
-                if item.get('examples') and len(item['examples']) > 0:
-                    examples_text = "例句: "
-                    for j, example in enumerate(item['examples'], 1):
-                        examples_text += f"{j}. {example}\n"
-                    content_parts.append(examples_text.strip())
-                
-                # 添加相关词汇
-                if item.get('related_words') and len(item['related_words']) > 0:
-                    related_text = "相关词汇: "
-                    for word in item['related_words']:
-                        related_text += f"- {word}\n"
-                    content_parts.append(related_text.strip())
-                
-                api_item = {
-                    "id": str(i),
-                    "title": item.get('word', ''),
-                    "content": "\n".join(content_parts),
-                    "recitation_type": "vocabulary",
-                    "difficulty_level": item.get('difficulty_level', 1),
-                    "is_memorized": False,
-                    "practice_count": 0,
-                    "created_at": item.get('created_at', "2025-01-01T00:00:00Z"),
-                    "updated_at": item.get('created_at', "2025-01-01T00:00:00Z")
-                }
-                api_data.append(api_item)
-            
-            return api_data
+        # 查询初一英语词汇
+        vocabularies = db.query(Recitation).filter(
+            Recitation.recitation_type == "vocabulary",
+            Recitation.grade_level == "初一"
+        ).all()
+        
+        print(f"从数据库加载了 {len(vocabularies)} 个词汇")
+        print(f"数据库查询结果: {len(vocabularies)} 个词汇")
+        if len(vocabularies) > 0:
+            print(f"第一个词汇: {vocabularies[0].title}")
         else:
-            # 如果文件不存在，返回模拟数据
-            return [
-                {
-                    "id": "1",
-                    "title": "ready",
-                    "content": "音标: /ˈredi/\n词性: 形容词 (adjective)\n中文释义: 准备好(做某事)的\n例句: 1. I am ready for the exam. (我准备好考试了。)\n2. Are you ready to go? (你准备好走了吗？)\n联想记忆: 发音联想：ready发音类似瑞迪，想象一个叫瑞迪的人总是很准备好。\n相关词汇: - 近义词: prepared, set\n- 反义词: unready, unprepared\n- 派生词: readiness (n. 准备就绪), readily (adv. 乐意地)",
-                    "recitation_type": "vocabulary",
-                    "difficulty_level": 1,
-                    "is_memorized": False,
-                    "practice_count": 0,
-                    "created_at": "2025-01-01T00:00:00Z",
-                    "updated_at": "2025-01-01T00:00:00Z"
-                }
-            ]
+            print("数据库中没有找到词汇数据")
+        
+        api_data = []
+        for i, vocab in enumerate(vocabularies, 1):
+            # 只使用markdown_content字段，确保数据一致性
+            content = vocab.markdown_content or ""
+            
+            api_item = {
+                "id": str(vocab.id),
+                "title": vocab.title,
+                "content": content,  # 使用Markdown内容
+                "recitation_type": vocab.recitation_type,
+                "vocabulary_type": vocab.vocabulary_type,
+                "grade_level": vocab.grade_level,
+                "unit_name": vocab.unit_name,
+                "difficulty_level": vocab.difficulty_level,
+                "is_memorized": vocab.is_memorized,
+                "practice_count": vocab.practice_count,
+                "created_at": vocab.created_at.isoformat() if vocab.created_at else "2025-01-01T00:00:00Z",
+                "updated_at": vocab.updated_at.isoformat() if vocab.updated_at else "2025-01-01T00:00:00Z"
+            }
+            api_data.append(api_item)
+            
+            if i <= 3:  # 只打印前3个的调试信息
+                print(f"Item {i}: word={vocab.title}, vocabulary_type={vocab.vocabulary_type}")
+        
+        return api_data
+        
     except Exception as e:
-        print(f"读取词汇数据失败: {e}")
+        print(f"从数据库读取词汇数据失败: {e}")
         return []
 
 @app.post("/api/v1/vocabulary/import-grade1-english")
