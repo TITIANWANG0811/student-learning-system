@@ -747,10 +747,12 @@ const Vocabulary: React.FC = () => {
                   }
                   
                   // 例句
-                  else if (trimmedLine.includes('**例句**:') || /^\d+\./.test(trimmedLine) || /^[A-Z][a-z].*\./.test(trimmedLine) || /^>\s*\d+\./.test(trimmedLine)) {
+                  else if (trimmedLine.includes('**例句**:') || /^\d+\./.test(trimmedLine) || /^[A-Z][a-z].*\./.test(trimmedLine) || /^>\s*\d+\./.test(trimmedLine) || trimmedLine.includes('[!note] 例句')) {
                     const example = trimmedLine
                       .replace(/^>\s*-\s*\*\*例句\*\*:\s*/, '')
                       .replace(/\*\*例句\*\*:\s*/, '')
+                      .replace(/^>\s*\[!note\]\s*例句\s*/, '')
+                      .replace(/\[!note\]\s*例句\s*/, '')
                       .replace(/>/g, '')
                       .replace(/\*/g, '')
                       .replace(/^[-•]\s*/, '') // 移除列表符号
