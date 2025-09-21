@@ -735,19 +735,30 @@ const Vocabulary: React.FC = () => {
                     
                     sections.push(
                       <div key={`example-${index}`} style={{ 
-                        marginBottom: 12, 
-                        padding: '12px', 
+                        marginBottom: 16, 
+                        padding: '0', 
                         background: '#ffffff', 
-                        borderRadius: '6px',
-                        border: '1px solid #dee2e6',
-                        fontSize: '14px',
-                        lineHeight: '1.6',
-                        color: '#495057'
+                        borderRadius: '8px',
+                        border: '2px solid #e8f5e8',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                        overflow: 'hidden'
                       }}>
-                        <div style={{ fontWeight: '600', color: '#6c757d', marginBottom: '4px' }}>
-                          例句：
+                        <div style={{ 
+                          padding: '12px 16px',
+                          background: 'linear-gradient(135deg, #4caf50 0%, #2e7d32 100%)',
+                          color: 'white',
+                          fontSize: '14px',
+                          fontWeight: '600'
+                        }}>
+                          📝 例句
                         </div>
-                        <div style={{ fontStyle: 'italic' }}>
+                        <div style={{ 
+                          padding: '16px',
+                          fontSize: '14px',
+                          lineHeight: '1.6',
+                          color: '#2e7d32',
+                          fontStyle: 'italic'
+                        }}>
                           {example}
                         </div>
                       </div>
@@ -788,38 +799,40 @@ const Vocabulary: React.FC = () => {
                     sections.push(
                       <div key={`memory-${index}`} style={{ 
                         marginBottom: 24, 
-                        padding: '24px', 
+                        padding: '0', 
                         background: '#ffffff', 
                         borderRadius: 12,
                         border: '2px solid #e3f2fd',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                        overflow: 'hidden'
                       }}>
                         <div style={{ 
                           display: 'flex', 
                           alignItems: 'center', 
-                          marginBottom: 20,
-                          paddingBottom: 12,
-                          borderBottom: '2px solid #e3f2fd'
+                          padding: '20px 24px',
+                          background: 'linear-gradient(135deg, #2196f3 0%, #1976d2 100%)',
+                          color: 'white'
                         }}>
                           <div style={{
-                            background: '#2196f3',
+                            background: 'rgba(255,255,255,0.2)',
                             color: 'white',
                             borderRadius: '50%',
-                            width: '32px',
-                            height: '32px',
+                            width: '36px',
+                            height: '36px',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             marginRight: 12,
-                            fontSize: '16px',
+                            fontSize: '18px',
                             fontWeight: 'bold'
                           }}>
                             🧠
                           </div>
-                          <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#1976d2' }}>
+                          <Text style={{ fontSize: 20, fontWeight: 'bold', color: 'white' }}>
                             联想记忆技巧
                           </Text>
                         </div>
+                        <div style={{ padding: '24px' }}>
                         
                         <div style={{ display: 'grid', gap: '20px' }}>
                           {splitMethod && splitContent.length > 0 && (
@@ -960,6 +973,7 @@ const Vocabulary: React.FC = () => {
                             </div>
                           )}
                         </div>
+                        </div>
                       </div>
                     );
                   }
@@ -995,38 +1009,40 @@ const Vocabulary: React.FC = () => {
                     sections.push(
                       <div key={`related-${index}`} style={{ 
                         marginBottom: 24, 
-                        padding: '24px', 
+                        padding: '0', 
                         background: '#ffffff', 
                         borderRadius: 12,
                         border: '2px solid #fff3e0',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                        overflow: 'hidden'
                       }}>
                         <div style={{ 
                           display: 'flex', 
                           alignItems: 'center', 
-                          marginBottom: 20,
-                          paddingBottom: 12,
-                          borderBottom: '2px solid #fff3e0'
+                          padding: '20px 24px',
+                          background: 'linear-gradient(135deg, #ff9800 0%, #f57c00 100%)',
+                          color: 'white'
                         }}>
                           <div style={{
-                            background: '#ff9800',
+                            background: 'rgba(255,255,255,0.2)',
                             color: 'white',
                             borderRadius: '50%',
-                            width: '32px',
-                            height: '32px',
+                            width: '36px',
+                            height: '36px',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             marginRight: 12,
-                            fontSize: '16px',
+                            fontSize: '18px',
                             fontWeight: 'bold'
                           }}>
                             🔗
                           </div>
-                          <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#f57c00' }}>
+                          <Text style={{ fontSize: 20, fontWeight: 'bold', color: 'white' }}>
                             词汇网络
                           </Text>
                         </div>
+                        <div style={{ padding: '24px' }}>
                         
                         <div style={{ display: 'grid', gap: '16px' }}>
                           {synonymWords.length > 0 && (
@@ -1213,6 +1229,7 @@ const Vocabulary: React.FC = () => {
                               </div>
                             </div>
                           )}
+                        </div>
                         </div>
                       </div>
                     );
