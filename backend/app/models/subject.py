@@ -39,6 +39,8 @@ class Subject(Base):
     recitations = relationship("Recitation", back_populates="subject")
     practice_records = relationship("PracticeRecord", back_populates="subject")
     wrong_questions = relationship("WrongQuestion", back_populates="subject")
+    chinese_notes = relationship("ChineseNotes", back_populates="subject_rel")
+    english_vocabulary = relationship("EnglishVocabulary", back_populates="subject")
 
 
 class TextbookChapter(Base):

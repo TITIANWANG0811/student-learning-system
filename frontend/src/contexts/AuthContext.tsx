@@ -102,16 +102,31 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       message.success('注册成功，请登录');
       return true;
     } catch (error: any) {
-      message.error(error.response?.data?.detail || '注册失败');
+      console.error('注册错误:', error);
+      const errorMessage = error.response?.data?.detail || error.message || '注册失败';
+      message.error(`注册失败: ${errorMessage}`);
       return false;
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem('token');
-    setToken(null);
-    setUser(null);
-    message.success('已退出登录');
+  const logout = async () => {
+    try {
+      // 调用后端登出API（可选）
+      if (token) {
+        await api.post('/auth/logout');
+      }
+    } catch (error) {
+      // 登出API失败不影响前端登出
+      console.warn('登出API调用失败:', error);
+    } finally {
+      // 清除本地状态
+      localStorage.removeItem('token');
+      setToken(null);
+      setUser(null);
+      message.success('已退出登录');
+      // 重定向到登录页面
+      window.location.href = '/login';
+    }
   };
 
   const value = {

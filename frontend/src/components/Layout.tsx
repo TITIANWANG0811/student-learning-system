@@ -175,7 +175,6 @@ const Layout: React.FC = () => {
       key: 'logout',
       icon: <LogoutOutlined />,
       label: '退出登录',
-      onClick: logout,
     },
   ];
 

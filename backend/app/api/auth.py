@@ -13,7 +13,7 @@ from app.models.user import User
 from config import settings
 
 router = APIRouter()
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
 
 @router.post("/register", response_model=UserResponse)
@@ -38,7 +38,7 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     db_user = User(
         username=user.username,
         email=user.email,
-        password_hash=hashed_password,
+        hashed_password=hashed_password,
         full_name=user.full_name,
         grade=user.grade,
         class_name=user.class_name,
@@ -93,3 +93,10 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         )
     
     return user
+
+@router.post("/logout")
+async def logout(current_user: User = Depends(get_current_user)):
+    """用户登出"""
+    # 由于JWT是无状态的，这里主要是记录登出事件
+    # 在实际应用中，可以将token加入黑名单
+    return {"message": "登出成功"}

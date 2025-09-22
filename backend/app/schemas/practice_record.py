@@ -52,7 +52,7 @@ class PracticeRecordResponse(PracticeRecordBase):
 
 class PracticeRecordWithSubject(PracticeRecordResponse):
     """包含学科信息的练习记录响应模式"""
-    subject: Optional['SubjectResponse'] = None
+    subject: Optional[dict] = None
     
     class Config:
         from_attributes = True

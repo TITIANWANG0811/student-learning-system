@@ -43,6 +43,8 @@ class User(Base):
     recitations = relationship("Recitation", back_populates="student")
     practice_records = relationship("PracticeRecord", back_populates="student")
     wrong_questions = relationship("WrongQuestion", back_populates="student")
+    chinese_notes = relationship("ChineseNotes", back_populates="user")
+    english_vocabulary = relationship("EnglishVocabulary", back_populates="user")
     
     # 家长关系
     parent_relations = relationship("ParentStudentRelation", foreign_keys="ParentStudentRelation.parent_id", back_populates="parent")

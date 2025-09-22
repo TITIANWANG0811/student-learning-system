@@ -23,13 +23,15 @@ class Recitation(Base):
     markdown_content = Column(Text, nullable=True)  # Markdown格式的完整内容
     recitation_type = Column(String(20), nullable=False)  # poetry, prose, formula, vocabulary, definition, other
     vocabulary_type = Column(String(20), nullable=True)  # word, phrase, idiom, expression, proper_noun
-    # proper_noun_type = Column(String(20), nullable=True)  # 临时注释掉，数据库表没有这个字段
+    proper_noun_type = Column(String(20), nullable=True)  # person_name, place_name, other (当vocabulary_type=proper_noun时使用)
     grade_level = Column(String(10), nullable=True)  # 初一, 初二, 初三
     unit_name = Column(String(50), nullable=True)  # Starter, Unit 1, Unit 2等
     difficulty_level = Column(Integer, default=1)  # 1-5难度等级
     is_memorized = Column(Boolean, default=False)  # 是否已背诵
     practice_count = Column(Integer, default=0)  # 练习次数
     last_practice_date = Column(DateTime(timezone=True))
+    is_public = Column(Boolean, default=False, comment="是否公开")
+    is_shared = Column(Boolean, default=False, comment="是否分享给同学")
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now())
     

@@ -6,8 +6,10 @@ import 'antd/dist/reset.css';
 import './styles/responsive.css';
 
 import Layout from './components/Layout';
+import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import TestRegister from './pages/TestRegister';
 import Dashboard from './pages/Dashboard';
 import StudyPlan from './pages/StudyPlan';
 import StudyTasks from './pages/StudyTasks';
@@ -34,7 +36,12 @@ const App: React.FC = () => {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/" element={<Layout />}>
+            <Route path="/test-register" element={<TestRegister />} />
+            <Route path="/" element={
+              <ProtectedRoute>
+                <Layout />
+              </ProtectedRoute>
+            }>
               <Route index element={<Navigate to="/dashboard" replace />} />
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="study-plan" element={<StudyPlan />} />

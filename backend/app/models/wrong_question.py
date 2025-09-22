@@ -26,6 +26,8 @@ class WrongQuestion(Base):
     is_mastered = Column(Boolean, default=False)  # 是否已掌握
     review_count = Column(Integer, default=0)  # 复习次数
     last_review_date = Column(DateTime(timezone=True))
+    is_public = Column(Boolean, default=False, comment="是否公开")
+    is_shared = Column(Boolean, default=False, comment="是否分享给同学")
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now())
     

@@ -41,6 +41,7 @@ const { Option } = Select;
 // 接口定义已移动到 vocabularyApi.ts
 
 const Vocabulary: React.FC = () => {
+  console.log('Vocabulary组件渲染');
   const [vocabulary, setVocabulary] = useState<VocabularyItem[]>([]);
   const [stats, setStats] = useState<VocabularyStats | null>(null);
   const [loading, setLoading] = useState(false);
@@ -62,26 +63,29 @@ const Vocabulary: React.FC = () => {
     loadStats();
   }, []);
 
-  // 当筛选条件或年级改变时重新加载数据
-  useEffect(() => {
-    // 测试模式：直接重新加载数据
-    loadVocabulary();
-  }, [memorizedFilter, vocabularyTypeFilter, unitFilter, selectedGrade]);
-
   const loadVocabulary = async () => {
+    console.log('loadVocabulary函数被调用，selectedGrade:', selectedGrade);
     setLoading(true);
     try {
       let response;
       
       // 根据选择的年级加载不同的数据
-      if (selectedGrade === '初一') {
+      if (selectedGrade === '初一' || selectedGrade === '初二') {
         response = await getGrade1EnglishVocabulary({
           is_memorized: memorizedFilter
         });
-      } else if (selectedGrade === '初二') {
-        // 初二暂时没有数据，显示空列表
-        response = [];
-        message.info('初二英语词汇数据暂未维护，请选择其他年级');
+        console.log('API返回的总数据量:', response.length);
+        console.log('初二数据:', response.filter(item => item.grade_level === '初二').length);
+        console.log('初一数据:', response.filter(item => item.grade_level === '初一').length);
+        
+        // 根据年级筛选数据
+        if (selectedGrade === '初二') {
+          response = response.filter(item => item.grade_level === '初二');
+          console.log('筛选后的初二数据量:', response.length);
+        } else if (selectedGrade === '初一') {
+          response = response.filter(item => item.grade_level === '初一');
+          console.log('筛选后的初一数据量:', response.length);
+        }
       } else if (selectedGrade === '初三') {
         // 初三暂时没有数据，显示空列表
         response = [];
@@ -96,6 +100,12 @@ const Vocabulary: React.FC = () => {
       setLoading(false);
     }
   };
+
+  // 当筛选条件或年级改变时重新加载数据
+  useEffect(() => {
+    console.log('useEffect触发，selectedGrade:', selectedGrade);
+    loadVocabulary();
+  }, [memorizedFilter, vocabularyTypeFilter, unitFilter, selectedGrade]);
 
   const loadStats = async () => {
     if (!user?.id) return;
@@ -183,7 +193,8 @@ const Vocabulary: React.FC = () => {
       }
     }
     
-    const matchesUnit = !unitFilter || item.unit_name === unitFilter;
+    const matchesUnit = !unitFilter || item.unit_name === unitFilter || 
+      (unitFilter && item.unit_name === ` ${unitFilter}`);
     
     return matchesSearch && matchesMemorized && matchesVocabularyType && matchesUnit;
   });
@@ -516,10 +527,10 @@ const Vocabulary: React.FC = () => {
                  }}>
                    <BookOutlined style={{ fontSize: 48, marginBottom: 16, color: '#d9d9d9' }} />
                    <div style={{ fontSize: 16, marginBottom: 8 }}>
-                     {selectedGrade === '初一' ? '暂无词汇数据' : `${selectedGrade}英语词汇数据暂未维护`}
+                     {selectedGrade === '初三' ? `${selectedGrade}英语词汇数据暂未维护` : '暂无词汇数据'}
                    </div>
                    <div style={{ fontSize: 14, color: '#bfbfbf' }}>
-                     {selectedGrade === '初一' ? '暂无词汇数据' : '请选择其他年级或联系管理员添加数据'}
+                     {selectedGrade === '初三' ? '请选择其他年级或联系管理员添加数据' : '暂无词汇数据'}
                    </div>
                  </div>
                ) : (

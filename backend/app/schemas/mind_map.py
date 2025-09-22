@@ -50,7 +50,7 @@ class MindMapResponse(MindMapBase):
 
 class MindMapWithSubject(MindMapResponse):
     """包含学科信息的思维导图响应模式"""
-    subject: Optional['SubjectResponse'] = None
+    subject: Optional[dict] = None
     
     class Config:
         from_attributes = True

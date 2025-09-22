@@ -52,7 +52,7 @@ class WrongQuestionResponse(WrongQuestionBase):
 
 class WrongQuestionWithSubject(WrongQuestionResponse):
     """包含学科信息的错题响应模式"""
-    subject: Optional['SubjectResponse'] = None
+    subject: Optional[dict] = None
     
     class Config:
         from_attributes = True

@@ -27,7 +27,7 @@ class SubjectResponse(BaseModel):
 
 class SubjectWithCategory(SubjectResponse):
     """包含分类信息的学科响应模式"""
-    category: Optional['SubjectCategoryResponse'] = None
+    category: Optional[dict] = None
     
     class Config:
         from_attributes = True

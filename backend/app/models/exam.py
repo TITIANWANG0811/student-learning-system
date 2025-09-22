@@ -1,7 +1,7 @@
 """
 考试相关数据模型
 """
-from sqlalchemy import Column, String, Text, DateTime, ForeignKey, Integer, Enum
+from sqlalchemy import Column, String, Text, DateTime, ForeignKey, Integer, Enum, Boolean
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 import uuid
@@ -40,6 +40,8 @@ class Exam(Base):
     total_score = Column(Integer, nullable=False)
     score = Column(Integer)
     status = Column(Enum(ExamStatus), default=ExamStatus.SCHEDULED)
+    is_public = Column(Boolean, default=False, comment="是否公开")
+    is_shared = Column(Boolean, default=False, comment="是否分享给同学")
     created_at = Column(DateTime, nullable=False)
     
     # 关系

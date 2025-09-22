@@ -49,7 +49,7 @@ class SubjectCategoryResponse(SubjectCategoryBase):
 
 class SubjectCategoryWithSubjects(SubjectCategoryResponse):
     """包含学科的学科分类响应模式"""
-    subjects: List['SubjectResponse'] = Field(default=[], description="学科列表")
+    subjects: List[dict] = Field(default=[], description="学科列表")
     
     class Config:
         from_attributes = True

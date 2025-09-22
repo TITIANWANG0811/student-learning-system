@@ -10,8 +10,17 @@ import os
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.models.recitation import Recitation
+from app.models.subject import Subject
+from app.api.v1.english_vocabulary import router as english_vocabulary_router
+from app.api.v1.chinese_notes import router as chinese_notes_router
+from app.api.auth import router as auth_router
 
 app = FastAPI(title="测试API")
+
+# 注册API路由
+app.include_router(auth_router, prefix="/api/v1/auth", tags=["认证"])
+app.include_router(english_vocabulary_router, prefix="/api/v1/english-vocabulary", tags=["英语词汇"])
+app.include_router(chinese_notes_router, prefix="/api/v1/chinese-notes", tags=["语文笔记"])
 
 # 添加CORS中间件
 app.add_middleware(
@@ -45,10 +54,11 @@ def get_grade1_english_vocabulary():
         # 获取数据库连接
         db = next(get_db())
         
-        # 查询初一英语词汇
+        # 查询初一和初二英语词汇和定义
         vocabularies = db.query(Recitation).filter(
-            Recitation.recitation_type == "vocabulary",
-            Recitation.grade_level == "初一"
+            Recitation.grade_level.in_(["初一", "初二"])
+        ).filter(
+            Recitation.recitation_type == "vocabulary"
         ).all()
         
         print(f"从数据库加载了 {len(vocabularies)} 个词汇")
@@ -128,6 +138,77 @@ def get_vocabulary_stats():
 def update_recitation(recitation_id: str, data: dict):
     """更新默写状态"""
     return {"message": "更新成功"}
+
+@app.get("/api/v1/subjects/by-category")
+def get_subjects_by_category():
+    """获取按分类组织的学科列表"""
+    try:
+        # 获取数据库连接
+        db = next(get_db())
+        
+        # 查询所有学科
+        subjects = db.query(Subject).filter(Subject.is_active == True).all()
+        
+        # 按分类组织
+        categories = {
+            "核心学科": [],
+            "文科": [],
+            "理科": [],
+            "其他": []
+        }
+        
+        for subject in subjects:
+            # 根据学科名称分类
+            if subject.name in ["语文", "数学", "英语"]:
+                categories["核心学科"].append({
+                    "id": str(subject.id),
+                    "name": subject.name,
+                    "code": subject.code,
+                    "description": subject.description,
+                    "color": subject.color,
+                    "icon": subject.icon,
+                    "difficulty_level": subject.difficulty_level,
+                    "is_core_subject": subject.is_core_subject
+                })
+            elif subject.name in ["历史", "地理", "政治", "道法"]:
+                categories["文科"].append({
+                    "id": str(subject.id),
+                    "name": subject.name,
+                    "code": subject.code,
+                    "description": subject.description,
+                    "color": subject.color,
+                    "icon": subject.icon,
+                    "difficulty_level": subject.difficulty_level,
+                    "is_core_subject": subject.is_core_subject
+                })
+            elif subject.name in ["物理", "化学", "生物"]:
+                categories["理科"].append({
+                    "id": str(subject.id),
+                    "name": subject.name,
+                    "code": subject.code,
+                    "description": subject.description,
+                    "color": subject.color,
+                    "icon": subject.icon,
+                    "difficulty_level": subject.difficulty_level,
+                    "is_core_subject": subject.is_core_subject
+                })
+            else:
+                categories["其他"].append({
+                    "id": str(subject.id),
+                    "name": subject.name,
+                    "code": subject.code,
+                    "description": subject.description,
+                    "color": subject.color,
+                    "icon": subject.icon,
+                    "difficulty_level": subject.difficulty_level,
+                    "is_core_subject": subject.is_core_subject
+                })
+        
+        return categories
+        
+    except Exception as e:
+        print(f"获取学科分类失败: {e}")
+        return {"error": str(e)}
 
 if __name__ == "__main__":
     import uvicorn

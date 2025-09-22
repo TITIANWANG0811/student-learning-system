@@ -15,6 +15,8 @@ from .recitations import router as recitations_router
 from .practice_records import router as practice_records_router
 from .wrong_questions import router as wrong_questions_router
 from .vocabulary import router as vocabulary_router
+from .v1.english_vocabulary import router as english_vocabulary_router
+from .v1.chinese_notes import router as chinese_notes_router
 
 # 创建主路由器
 api_router = APIRouter()
@@ -33,3 +35,5 @@ api_router.include_router(recitations_router, prefix="/recitations", tags=["默�
 api_router.include_router(practice_records_router, prefix="/practice-records", tags=["练习记录"])
 api_router.include_router(wrong_questions_router, prefix="/wrong-questions", tags=["错题本"])
 api_router.include_router(vocabulary_router, prefix="/vocabulary", tags=["词汇管理"])
+api_router.include_router(english_vocabulary_router, prefix="/english-vocabulary", tags=["英语词汇"])
+api_router.include_router(chinese_notes_router, prefix="/chinese-notes", tags=["语文笔记"])

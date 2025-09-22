@@ -62,7 +62,7 @@ class RecitationResponse(RecitationBase):
 
 class RecitationWithSubject(RecitationResponse):
     """包含学科信息的默写响应模式"""
-    subject: Optional['SubjectResponse'] = None
+    subject: Optional[dict] = None
     
     class Config:
         from_attributes = True

@@ -68,6 +68,8 @@ class Assignment(Base):
     status = Column(Enum(AssignmentStatus), default=AssignmentStatus.PENDING)
     score = Column(Integer)
     feedback = Column(Text)
+    is_public = Column(Boolean, default=False, comment="是否公开")
+    is_shared = Column(Boolean, default=False, comment="是否分享给同学")
     created_at = Column(DateTime, nullable=False)
     
     # 关系
