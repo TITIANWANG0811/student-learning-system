@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     """应用配置类"""
     
     # 数据库配置
-    database_url: str = "postgresql://username:password@localhost:5432/student_learning_system"
+    database_url: str = "postgresql://titianwang@localhost:5432/student_learning_system"
     redis_url: str = "redis://localhost:6379/1"  # 使用数据库1，避免与其他项目冲突
     
     # JWT配置

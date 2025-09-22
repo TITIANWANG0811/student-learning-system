@@ -23,7 +23,7 @@ class Recitation(Base):
     markdown_content = Column(Text, nullable=True)  # Markdown格式的完整内容
     recitation_type = Column(String(20), nullable=False)  # poetry, prose, formula, vocabulary, definition, other
     vocabulary_type = Column(String(20), nullable=True)  # word, phrase, idiom, expression, proper_noun
-    proper_noun_type = Column(String(20), nullable=True)  # person_name, place_name, other (当vocabulary_type=proper_noun时使用)
+    # proper_noun_type = Column(String(20), nullable=True)  # 临时注释掉，数据库表没有这个字段
     grade_level = Column(String(10), nullable=True)  # 初一, 初二, 初三
     unit_name = Column(String(50), nullable=True)  # Starter, Unit 1, Unit 2等
     difficulty_level = Column(Integer, default=1)  # 1-5难度等级

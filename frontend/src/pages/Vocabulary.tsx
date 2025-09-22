@@ -13,13 +13,16 @@ import {
   Select,
   Modal
 } from 'antd';
+import VocabularyDetailCard from '../components/VocabularyDetailCard';
 import {
   BookOutlined,
   TrophyOutlined,
   ClockCircleOutlined,
   CheckCircleOutlined,
   BarChartOutlined,
-  StarOutlined
+  StarOutlined,
+  LeftOutlined,
+  RightOutlined
 } from '@ant-design/icons';
 import { useResponsive } from '../hooks/useResponsive';
 import { 
@@ -48,6 +51,7 @@ const Vocabulary: React.FC = () => {
   const [selectedGrade, setSelectedGrade] = useState<string>('初一');
   const [selectedWord, setSelectedWord] = useState<VocabularyItem | null>(null);
   const [wordDetailVisible, setWordDetailVisible] = useState(false);
+  const [selectedWordIndex, setSelectedWordIndex] = useState<number>(-1);
   const { isMobile, isTablet } = useResponsive();
   const { user } = useAuth();
 
@@ -124,13 +128,39 @@ const Vocabulary: React.FC = () => {
   };
 
   const handleWordClick = (word: VocabularyItem) => {
+    const currentList = filteredVocabulary;
+    const index = currentList.findIndex(item => item.id === word.id);
     setSelectedWord(word);
+    setSelectedWordIndex(index);
     setWordDetailVisible(true);
   };
 
   const closeWordDetail = () => {
     setWordDetailVisible(false);
     setSelectedWord(null);
+    setSelectedWordIndex(-1);
+  };
+
+  // 导航到上一个单词
+  const goToPrevWord = () => {
+    const currentList = filteredVocabulary;
+    if (selectedWordIndex > 0) {
+      const prevIndex = selectedWordIndex - 1;
+      const prevWord = currentList[prevIndex];
+      setSelectedWord(prevWord);
+      setSelectedWordIndex(prevIndex);
+    }
+  };
+
+  // 导航到下一个单词
+  const goToNextWord = () => {
+    const currentList = filteredVocabulary;
+    if (selectedWordIndex < currentList.length - 1) {
+      const nextIndex = selectedWordIndex + 1;
+      const nextWord = currentList[nextIndex];
+      setSelectedWord(nextWord);
+      setSelectedWordIndex(nextIndex);
+    }
   };
 
   const filteredVocabulary = vocabulary.filter(item => {
@@ -520,8 +550,21 @@ const Vocabulary: React.FC = () => {
         open={wordDetailVisible}
         onCancel={closeWordDetail}
         footer={[
-          <Button key="close" onClick={closeWordDetail}>
-            关闭
+          <Button 
+            key="prev" 
+            icon={<LeftOutlined />}
+            onClick={goToPrevWord}
+            disabled={selectedWordIndex <= 0}
+          >
+            上一个
+          </Button>,
+          <Button 
+            key="next" 
+            icon={<RightOutlined />}
+            onClick={goToNextWord}
+            disabled={selectedWordIndex >= filteredVocabulary.length - 1}
+          >
+            下一个
           </Button>,
           selectedWord && (
             <Button
@@ -591,724 +634,7 @@ const Vocabulary: React.FC = () => {
 
             {/* 单词详细内容 */}
             <div style={{ padding: '24px' }}>
-              {(() => {
-                const lines = selectedWord.content.split('\n');
-                const sections: React.ReactNode[] = [];
-                let currentSection = null;
-                
-                lines.forEach((line, index) => {
-                  const trimmedLine = line.trim();
-                  if (!trimmedLine) return;
-                  
-                  // 音标
-                  if (trimmedLine.includes('**音标**:') || (trimmedLine.includes('/') && !trimmedLine.includes('http') && !trimmedLine.includes('#'))) {
-                    const phonetic = trimmedLine
-                      .replace(/^>\s*-\s*\*\*音标\*\*:\s*/, '')
-                      .replace(/\*\*音标\*\*:\s*/, '')
-                      .replace(/>/g, '')
-                      .replace(/\*/g, '')
-                      .replace(/^[-•]\s*/, '') // 移除列表符号
-                      .replace(/#[a-zA-Z0-9\-/]+/g, '') // 移除标签如 #mcl/list-card
-                      .replace(/^#+\s*/, '') // 移除Markdown标题符号
-                      .trim();
-                    
-                    // 只有当音标不为空且包含音标符号时才显示
-                    if (phonetic && (phonetic.includes('/') || phonetic.includes('[') || phonetic.includes(']'))) {
-                      sections.push(
-                        <div key={`phonetic-${index}`} style={{ 
-                          marginBottom: 16, 
-                          padding: '0', 
-                          background: '#ffffff', 
-                          borderRadius: '8px',
-                          border: '2px solid #e8f5e8',
-                          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                          overflow: 'hidden'
-                        }}>
-                          <div style={{ 
-                            padding: '12px 16px',
-                            background: 'linear-gradient(135deg, #4caf50 0%, #2e7d32 100%)',
-                            color: 'white',
-                            fontSize: '14px',
-                            fontWeight: '600'
-                          }}>
-                            🔊 音标
-                          </div>
-                          <div style={{ 
-                            padding: '16px',
-                            fontSize: '20px',
-                            fontWeight: 'bold',
-                            color: '#2e7d32',
-                            fontFamily: 'monospace'
-                          }}>
-                            {phonetic}
-                          </div>
-                        </div>
-                      );
-                    }
-                  }
-                  
-                  // 词性
-                  else if (trimmedLine.includes('**词性**:')) {
-                    const pos = trimmedLine
-                      .replace(/^>\s*-\s*\*\*词性\*\*:\s*/, '')
-                      .replace(/\*\*词性\*\*:\s*/, '')
-                      .replace(/>/g, '')
-                      .replace(/\*/g, '')
-                      .replace(/^[-•]\s*/, '') // 移除列表符号
-                      .replace(/#[a-zA-Z0-9\-/]+/g, '') // 移除标签如 #mcl/list-card
-                      .trim();
-                    
-                    const getPosColor = (posText: string) => {
-                      if (posText.includes('n.') || posText.includes('名词')) return '#1890ff';
-                      if (posText.includes('v.') || posText.includes('动词')) return '#52c41a';
-                      if (posText.includes('adj.') || posText.includes('形容词')) return '#fa8c16';
-                      if (posText.includes('adv.') || posText.includes('副词')) return '#722ed1';
-                      return '#1890ff';
-                    };
-                    
-                    sections.push(
-                      <div key={`pos-${index}`} style={{ 
-                        marginBottom: 16, 
-                        padding: '0', 
-                        background: '#ffffff', 
-                        borderRadius: '8px',
-                        border: '2px solid #fff3e0',
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                        overflow: 'hidden'
-                      }}>
-                        <div style={{ 
-                          padding: '12px 16px',
-                          background: 'linear-gradient(135deg, #ff9800 0%, #f57c00 100%)',
-                          color: 'white',
-                          fontSize: '14px',
-                          fontWeight: '600'
-                        }}>
-                          🏷️ 词性
-                        </div>
-                        <div style={{ 
-                          padding: '16px',
-                          display: 'flex',
-                          alignItems: 'center'
-                        }}>
-                          <Tag color={getPosColor(pos)} style={{ 
-                            fontSize: 16, 
-                            fontWeight: 'bold', 
-                            padding: '8px 16px',
-                            borderRadius: 20
-                          }}>
-                            {pos}
-                          </Tag>
-                        </div>
-                      </div>
-                    );
-                  }
-                  
-                  // 中文释义
-                  else if (trimmedLine.includes('**中文释义**:')) {
-                    const meaning = trimmedLine
-                      .replace(/^>\s*-\s*\*\*中文释义\*\*:\s*/, '')
-                      .replace(/\*\*中文释义\*\*:\s*/, '')
-                      .replace(/>/g, '')
-                      .replace(/\*/g, '')
-                      .replace(/^[-•]\s*/, '') // 移除列表符号
-                      .replace(/#[a-zA-Z0-9\-/]+/g, '') // 移除标签如 #mcl/list-card
-                      .trim();
-                    
-                    sections.push(
-                      <div key={`meaning-${index}`} style={{ 
-                        marginBottom: 16, 
-                        padding: '0', 
-                        background: '#ffffff', 
-                        borderRadius: '8px',
-                        border: '2px solid #ffebee',
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                        overflow: 'hidden'
-                      }}>
-                        <div style={{ 
-                          padding: '12px 16px',
-                          background: 'linear-gradient(135deg, #f44336 0%, #d32f2f 100%)',
-                          color: 'white',
-                          fontSize: '14px',
-                          fontWeight: '600'
-                        }}>
-                          📖 中文释义
-                        </div>
-                        <div style={{ 
-                          padding: '16px',
-                          fontSize: '18px',
-                          fontWeight: 'bold',
-                          color: '#d32f2f',
-                          lineHeight: 1.6
-                        }}>
-                          {meaning}
-                        </div>
-                      </div>
-                    );
-                  }
-                  
-                  // 例句
-                  else if (trimmedLine.includes('**例句**:') || /^\d+\./.test(trimmedLine) || /^[A-Z][a-z].*\./.test(trimmedLine) || /^>\s*\d+\./.test(trimmedLine) || trimmedLine.includes('[!note] 例句')) {
-                    const example = trimmedLine
-                      .replace(/^>\s*-\s*\*\*例句\*\*:\s*/, '')
-                      .replace(/\*\*例句\*\*:\s*/, '')
-                      .replace(/^>\s*\[!note\]\s*例句\s*/, '')
-                      .replace(/\[!note\]\s*例句\s*/, '')
-                      .replace(/>/g, '')
-                      .replace(/\*/g, '')
-                      .replace(/^[-•]\s*/, '') // 移除列表符号
-                      .replace(/^\d+\.\s*/, '') // 移除数字编号
-                      .replace(/#[a-zA-Z0-9\-/]+/g, '') // 移除标签如 #mcl/list-card
-                      .trim();
-                    
-                    sections.push(
-                      <div key={`example-${index}`} style={{ 
-                        marginBottom: 16, 
-                        padding: '0', 
-                        background: '#ffffff', 
-                        borderRadius: '8px',
-                        border: '2px solid #e8f5e8',
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                        overflow: 'hidden'
-                      }}>
-                        <div style={{ 
-                          padding: '12px 16px',
-                          background: 'linear-gradient(135deg, #4caf50 0%, #2e7d32 100%)',
-                          color: 'white',
-                          fontSize: '14px',
-                          fontWeight: '600'
-                        }}>
-                          📝 例句
-                        </div>
-                        <div style={{ 
-                          padding: '16px',
-                          fontSize: '14px',
-                          lineHeight: '1.6',
-                          color: '#2e7d32',
-                          fontStyle: 'italic'
-                        }}>
-                          {example}
-                        </div>
-                      </div>
-                    );
-                  }
-                  
-                  // 联想记忆
-                  else if (trimmedLine.includes('**联想记忆**:') || trimmedLine.includes('**记忆**:') || trimmedLine.includes('联想记忆') || trimmedLine.includes('记忆') || trimmedLine.includes('[!tip] 联想记忆')) {
-                    const memory = trimmedLine
-                      .replace(/^>\s*-\s*\*\*联想记忆\*\*:\s*/, '')
-                      .replace(/\*\*联想记忆\*\*:\s*/, '')
-                      .replace(/\*\*记忆\*\*:\s*/, '')
-                      .replace(/联想记忆:\s*/, '')
-                      .replace(/记忆:\s*/, '')
-                      .replace(/^>\s*\[!tip\]\s*联想记忆\s*/, '')
-                      .replace(/\[!tip\]\s*联想记忆\s*/, '')
-                      .replace(/>/g, '')
-                      .replace(/\*/g, '')
-                      .replace(/^[-•]\s*/, '') // 移除列表符号
-                      .replace(/#[a-zA-Z0-9\-/]+/g, '') // 移除标签如 #mcl/list-card
-                      .trim();
-                    
-                    // 解析联想记忆内容，按方法分类显示
-                    const memoryLines = memory.split('\n').filter(line => line.trim());
-                    const splitMethod = memoryLines.find(line => line.includes('拆分记忆法'));
-                    const scenarioMethod = memoryLines.find(line => line.includes('场景记忆法'));
-                    const homophonicMethod = memoryLines.find(line => line.includes('谐音记忆法'));
-                    
-                    const splitContent = memoryLines.filter((line, i) => {
-                      const prevLine = memoryLines[i - 1];
-                      return prevLine && prevLine.includes('拆分记忆法') && !line.includes('场景记忆法') && !line.includes('谐音记忆法');
-                    });
-                    const scenarioContent = memoryLines.filter((line, i) => {
-                      const prevLine = memoryLines[i - 1];
-                      return prevLine && prevLine.includes('场景记忆法') && !line.includes('谐音记忆法');
-                    });
-                    const homophonicContent = memoryLines.filter((line, i) => {
-                      const prevLine = memoryLines[i - 1];
-                      return prevLine && prevLine.includes('谐音记忆法');
-                    });
-
-                    sections.push(
-                      <div key={`memory-${index}`} style={{ 
-                        marginBottom: 24, 
-                        padding: '0', 
-                        background: '#ffffff', 
-                        borderRadius: 12,
-                        border: '2px solid #e3f2fd',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                        overflow: 'hidden'
-                      }}>
-                        <div style={{ 
-                          display: 'flex', 
-                          alignItems: 'center', 
-                          padding: '20px 24px',
-                          background: 'linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%)',
-                          color: 'white'
-                        }}>
-                          <div style={{
-                            background: 'rgba(255,255,255,0.2)',
-                            color: 'white',
-                            borderRadius: '50%',
-                            width: '36px',
-                            height: '36px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            marginRight: 12,
-                            fontSize: '18px',
-                            fontWeight: 'bold'
-                          }}>
-                            🧠
-                          </div>
-                          <Text style={{ fontSize: 20, fontWeight: 'bold', color: 'white' }}>
-                            联想记忆技巧
-                          </Text>
-                        </div>
-                        <div style={{ padding: '24px' }}>
-                        
-                        <div style={{ display: 'grid', gap: '20px' }}>
-                          {splitMethod && splitContent.length > 0 && (
-                            <div style={{ 
-                              padding: '16px', 
-                              background: '#f8f9fa', 
-                              borderRadius: '8px',
-                              border: '1px solid #e9ecef'
-                            }}>
-                              <div style={{ 
-                                display: 'flex', 
-                                alignItems: 'center', 
-                                marginBottom: 12 
-                              }}>
-                                <span style={{
-                                  background: '#4caf50',
-                                  color: 'white',
-                                  padding: '4px 8px',
-                                  borderRadius: '4px',
-                                  fontSize: '12px',
-                                  fontWeight: 'bold',
-                                  marginRight: '8px'
-                                }}>
-                                  方法1
-                                </span>
-                                <Text style={{ fontSize: 15, fontWeight: '600', color: '#2e7d32' }}>
-                                  拆分记忆法
-                                </Text>
-                              </div>
-                              <div style={{ paddingLeft: 8 }}>
-                                {splitContent.map((item, idx) => (
-                                  <div key={idx} style={{ 
-                                    marginBottom: 8, 
-                                    padding: '8px 12px',
-                                    background: '#ffffff',
-                                    borderRadius: '6px',
-                                    fontSize: 14, 
-                                    lineHeight: 1.6, 
-                                    color: '#495057',
-                                    border: '1px solid #e0e0e0'
-                                  }}>
-                                    <span style={{ color: '#4caf50', fontWeight: 'bold' }}>•</span> {item.replace(/^[-•]\s*/, '').trim()}
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                          
-                          {scenarioMethod && scenarioContent.length > 0 && (
-                            <div style={{ 
-                              padding: '16px', 
-                              background: '#fff3e0', 
-                              borderRadius: '8px',
-                              border: '1px solid #ffcc02'
-                            }}>
-                              <div style={{ 
-                                display: 'flex', 
-                                alignItems: 'center', 
-                                marginBottom: 12 
-                              }}>
-                                <span style={{
-                                  background: '#ff9800',
-                                  color: 'white',
-                                  padding: '4px 8px',
-                                  borderRadius: '4px',
-                                  fontSize: '12px',
-                                  fontWeight: 'bold',
-                                  marginRight: '8px'
-                                }}>
-                                  方法2
-                                </span>
-                                <Text style={{ fontSize: 15, fontWeight: '600', color: '#f57c00' }}>
-                                  场景记忆法
-                                </Text>
-                              </div>
-                              <div style={{ paddingLeft: 8 }}>
-                                {scenarioContent.map((item, idx) => (
-                                  <div key={idx} style={{ 
-                                    marginBottom: 8, 
-                                    padding: '8px 12px',
-                                    background: '#ffffff',
-                                    borderRadius: '6px',
-                                    fontSize: 14, 
-                                    lineHeight: 1.6, 
-                                    color: '#495057',
-                                    border: '1px solid #ffcc02'
-                                  }}>
-                                    <span style={{ color: '#ff9800', fontWeight: 'bold' }}>•</span> {item.replace(/^[-•]\s*/, '').trim()}
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                          
-                          {homophonicMethod && homophonicContent.length > 0 && (
-                            <div style={{ 
-                              padding: '16px', 
-                              background: '#f3e5f5', 
-                              borderRadius: '8px',
-                              border: '1px solid #ba68c8'
-                            }}>
-                              <div style={{ 
-                                display: 'flex', 
-                                alignItems: 'center', 
-                                marginBottom: 12 
-                              }}>
-                                <span style={{
-                                  background: '#9c27b0',
-                                  color: 'white',
-                                  padding: '4px 8px',
-                                  borderRadius: '4px',
-                                  fontSize: '12px',
-                                  fontWeight: 'bold',
-                                  marginRight: '8px'
-                                }}>
-                                  方法3
-                                </span>
-                                <Text style={{ fontSize: 15, fontWeight: '600', color: '#7b1fa2' }}>
-                                  谐音记忆法
-                                </Text>
-                              </div>
-                              <div style={{ paddingLeft: 8 }}>
-                                {homophonicContent.map((item, idx) => (
-                                  <div key={idx} style={{ 
-                                    marginBottom: 8, 
-                                    padding: '8px 12px',
-                                    background: '#ffffff',
-                                    borderRadius: '6px',
-                                    fontSize: 14, 
-                                    lineHeight: 1.6, 
-                                    color: '#495057',
-                                    border: '1px solid #ba68c8'
-                                  }}>
-                                    <span style={{ color: '#9c27b0', fontWeight: 'bold' }}>•</span> {item.replace(/^[-•]\s*/, '').trim()}
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                        </div>
-                      </div>
-                    );
-                  }
-                  
-                  // 相关词汇
-                  else if (trimmedLine.includes('**相关词汇**:') || trimmedLine.includes('**近义词**:') || trimmedLine.includes('**反义词**:') || trimmedLine.includes('[!abstract] 相关词汇')) {
-                    const related = trimmedLine
-                      .replace(/^>\s*-\s*\*\*相关词汇\*\*:\s*/, '')
-                      .replace(/\*\*相关词汇\*\*:\s*/, '')
-                      .replace(/\*\*近义词\*\*:\s*/, '')
-                      .replace(/\*\*反义词\*\*:\s*/, '')
-                      .replace(/^>\s*\[!abstract\]\s*相关词汇\s*/, '')
-                      .replace(/\[!abstract\]\s*相关词汇\s*/, '')
-                      .replace(/>/g, '')
-                      .replace(/\*/g, '')
-                      .replace(/^[-•]\s*/, '') // 移除列表符号
-                      .replace(/#[a-zA-Z0-9\-/]+/g, '') // 移除标签如 #mcl/list-card
-                      .trim();
-                    
-                    // 解析相关词汇内容，按类型分类显示
-                    const relatedLines = related.split('\n').filter(line => line.trim());
-                    const synonyms = relatedLines.find(line => line.includes('近义词:'));
-                    const antonyms = relatedLines.find(line => line.includes('反义词:'));
-                    const derivatives = relatedLines.find(line => line.includes('派生词:'));
-                    const phrases = relatedLines.find(line => line.includes('相关短语'));
-                    
-                    const synonymWords = synonyms ? synonyms.replace('近义词:', '').split(',').map(w => w.trim()).filter(w => w) : [];
-                    const antonymWords = antonyms ? antonyms.replace('反义词:', '').split(',').map(w => w.trim()).filter(w => w) : [];
-                    const derivativeWords = derivatives ? derivatives.replace('派生词:', '').split(',').map(w => w.trim()).filter(w => w) : [];
-                    const phraseContent = relatedLines.filter((line, i) => {
-                      const prevLine = relatedLines[i - 1];
-                      return prevLine && prevLine.includes('相关短语');
-                    });
-
-                    sections.push(
-                      <div key={`related-${index}`} style={{ 
-                        marginBottom: 24, 
-                        padding: '0', 
-                        background: '#ffffff', 
-                        borderRadius: 12,
-                        border: '2px solid #fff3e0',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                        overflow: 'hidden'
-                      }}>
-                        <div style={{ 
-                          display: 'flex', 
-                          alignItems: 'center', 
-                          padding: '20px 24px',
-                          background: 'linear-gradient(135deg, #2196f3 0%, #1976d2 100%)',
-                          color: 'white'
-                        }}>
-                          <div style={{
-                            background: 'rgba(255,255,255,0.2)',
-                            color: 'white',
-                            borderRadius: '50%',
-                            width: '36px',
-                            height: '36px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            marginRight: 12,
-                            fontSize: '18px',
-                            fontWeight: 'bold'
-                          }}>
-                            🔗
-                          </div>
-                          <Text style={{ fontSize: 20, fontWeight: 'bold', color: 'white' }}>
-                            词汇网络
-                          </Text>
-                        </div>
-                        <div style={{ padding: '24px' }}>
-                        
-                        <div style={{ display: 'grid', gap: '16px' }}>
-                          {synonymWords.length > 0 && (
-                            <div style={{ 
-                              padding: '16px', 
-                              background: '#e8f5e8', 
-                              borderRadius: '8px',
-                              border: '1px solid #4caf50'
-                            }}>
-                              <div style={{ 
-                                display: 'flex', 
-                                alignItems: 'center', 
-                                marginBottom: 12 
-                              }}>
-                                <span style={{
-                                  background: '#4caf50',
-                                  color: 'white',
-                                  padding: '4px 8px',
-                                  borderRadius: '4px',
-                                  fontSize: '12px',
-                                  fontWeight: 'bold',
-                                  marginRight: '8px'
-                                }}>
-                                  同义
-                                </span>
-                                <Text style={{ fontSize: 15, fontWeight: '600', color: '#2e7d32' }}>
-                                  近义词 ({synonymWords.length}个)
-                                </Text>
-                              </div>
-                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                                {synonymWords.map((word, idx) => (
-                                  <span key={idx} style={{ 
-                                    background: '#ffffff', 
-                                    color: '#2e7d32', 
-                                    padding: '6px 12px', 
-                                    borderRadius: '20px', 
-                                    fontSize: '13px',
-                                    fontWeight: '500',
-                                    border: '1px solid #4caf50',
-                                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-                                  }}>
-                                    {word}
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                          
-                          {antonymWords.length > 0 && (
-                            <div style={{ 
-                              padding: '16px', 
-                              background: '#ffebee', 
-                              borderRadius: '8px',
-                              border: '1px solid #f44336'
-                            }}>
-                              <div style={{ 
-                                display: 'flex', 
-                                alignItems: 'center', 
-                                marginBottom: 12 
-                              }}>
-                                <span style={{
-                                  background: '#f44336',
-                                  color: 'white',
-                                  padding: '4px 8px',
-                                  borderRadius: '4px',
-                                  fontSize: '12px',
-                                  fontWeight: 'bold',
-                                  marginRight: '8px'
-                                }}>
-                                  反义
-                                </span>
-                                <Text style={{ fontSize: 15, fontWeight: '600', color: '#c62828' }}>
-                                  反义词 ({antonymWords.length}个)
-                                </Text>
-                              </div>
-                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                                {antonymWords.map((word, idx) => (
-                                  <span key={idx} style={{ 
-                                    background: '#ffffff', 
-                                    color: '#c62828', 
-                                    padding: '6px 12px', 
-                                    borderRadius: '20px', 
-                                    fontSize: '13px',
-                                    fontWeight: '500',
-                                    border: '1px solid #f44336',
-                                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-                                  }}>
-                                    {word}
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                          
-                          {derivativeWords.length > 0 && (
-                            <div style={{ 
-                              padding: '16px', 
-                              background: '#f3e5f5', 
-                              borderRadius: '8px',
-                              border: '1px solid #9c27b0'
-                            }}>
-                              <div style={{ 
-                                display: 'flex', 
-                                alignItems: 'center', 
-                                marginBottom: 12 
-                              }}>
-                                <span style={{
-                                  background: '#9c27b0',
-                                  color: 'white',
-                                  padding: '4px 8px',
-                                  borderRadius: '4px',
-                                  fontSize: '12px',
-                                  fontWeight: 'bold',
-                                  marginRight: '8px'
-                                }}>
-                                  派生
-                                </span>
-                                <Text style={{ fontSize: 15, fontWeight: '600', color: '#7b1fa2' }}>
-                                  派生词 ({derivativeWords.length}个)
-                                </Text>
-                              </div>
-                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                                {derivativeWords.map((word, idx) => (
-                                  <span key={idx} style={{ 
-                                    background: '#ffffff', 
-                                    color: '#7b1fa2', 
-                                    padding: '6px 12px', 
-                                    borderRadius: '20px', 
-                                    fontSize: '13px',
-                                    fontWeight: '500',
-                                    border: '1px solid #9c27b0',
-                                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-                                  }}>
-                                    {word}
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                          
-                          {phraseContent.length > 0 && (
-                            <div style={{ 
-                              padding: '16px', 
-                              background: '#e3f2fd', 
-                              borderRadius: '8px',
-                              border: '1px solid #2196f3'
-                            }}>
-                              <div style={{ 
-                                display: 'flex', 
-                                alignItems: 'center', 
-                                marginBottom: 12 
-                              }}>
-                                <span style={{
-                                  background: '#2196f3',
-                                  color: 'white',
-                                  padding: '4px 8px',
-                                  borderRadius: '4px',
-                                  fontSize: '12px',
-                                  fontWeight: 'bold',
-                                  marginRight: '8px'
-                                }}>
-                                  短语
-                                </span>
-                                <Text style={{ fontSize: 15, fontWeight: '600', color: '#1976d2' }}>
-                                  相关短语 ({phraseContent.length}个)
-                                </Text>
-                              </div>
-                              <div style={{ paddingLeft: 8 }}>
-                                {phraseContent.map((item, idx) => (
-                                  <div key={idx} style={{ 
-                                    marginBottom: 8, 
-                                    padding: '8px 12px',
-                                    background: '#ffffff',
-                                    borderRadius: '6px',
-                                    fontSize: 14, 
-                                    lineHeight: 1.6, 
-                                    color: '#1976d2',
-                                    border: '1px solid #bbdefb',
-                                    fontWeight: '500'
-                                  }}>
-                                    <span style={{ color: '#2196f3', fontWeight: 'bold' }}>•</span> {item.replace(/^[-•]\s*/, '').trim()}
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                        </div>
-                      </div>
-                    );
-                  }
-                  
-                  // 其他信息
-                  else {
-                    const cleanText = trimmedLine
-                      .replace(/>/g, '')
-                      .replace(/\*/g, '')
-                      .replace(/^[-•]\s*/, '') // 移除列表符号
-                      .replace(/^\d+\.\s*/, '') // 移除数字编号
-                      .replace(/#[a-zA-Z0-9\-/]+/g, '') // 移除标签如 #mcl/list-card
-                      .replace(/^#+\s*/, '') // 移除Markdown标题符号
-                      .replace(/^\[!info\]\s*/, '') // 移除信息框标记
-                      .replace(/^\[!note\]\s*/, '') // 移除笔记标记
-                      .replace(/^\[!tip\]\s*/, '') // 移除提示标记
-                      .replace(/^\[!warning\]\s*/, '') // 移除警告标记
-                      .trim();
-                    
-                    // 跳过空行、只有符号的行和标题行
-                    if (!cleanText || cleanText.length < 2 || cleanText.startsWith('英语单词学习卡片') || cleanText.startsWith('单词信息')) return;
-                    
-                    sections.push(
-                      <div key={`other-${index}`} style={{ 
-                        marginBottom: 12, 
-                        padding: '12px 16px', 
-                        background: '#fafafa', 
-                        borderRadius: 6,
-                        border: '1px solid #d9d9d9'
-                      }}>
-                        <Text style={{ 
-                          fontSize: 15, 
-                          lineHeight: 1.5, 
-                          color: '#595959',
-                          display: 'block'
-                        }}>
-                          {cleanText}
-                        </Text>
-                      </div>
-                    );
-                  }
-                });
-                
-                return sections;
-              })()}
+              <VocabularyDetailCard selectedWord={selectedWord} />
             </div>
           </div>
         )}

@@ -2,7 +2,7 @@
 数据模式模块
 """
 from .user import UserCreate, UserResponse, UserUpdate, UserLogin
-from .subject import SubjectResponse, SubjectCategoryResponse, TextbookChapterResponse, KnowledgePointResponse
+from .subject import SubjectResponse, TextbookChapterResponse, KnowledgePointResponse
 from .study import StudyPlanCreate, StudyPlanResponse, StudyTaskCreate, StudyTaskResponse
 from .content import NoteCreate, NoteResponse, AssignmentCreate, AssignmentResponse
 from .exam import ExamCreate, ExamResponse
@@ -18,7 +18,6 @@ __all__ = [
     "UserUpdate",
     "UserLogin",
     "SubjectResponse",
-    "SubjectCategoryResponse",
     "TextbookChapterResponse",
     "KnowledgePointResponse",
     "StudyPlanCreate",
